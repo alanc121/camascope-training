@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camascope 2.0 — Step-by-Step Training</title>
+<style>
+  :root{
+    --ink:#1c2340; --ink-soft:#4a5273;
+    --brand1:#c026d3; --brand2:#7c3aed; --purple:#6d28d9; --purple-dark:#581c87;
+    --lilac:#f6f1fb; --card:#fff; --line:#e6ddf2;
+    --green:#16a34a; --green-bg:#eaf7ef;
+    --amber:#f59e0b; --amber-bg:#fef6e7;
+    --red:#dc2626; --red-bg:#fdeeee;
+    --blue:#2f6fed; --blue-bg:#eaf1fe;
+    --radius:18px; --shadow:0 6px 24px rgba(60,30,110,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:17px}
+  body{font-family:Seravek,"Trebuchet MS",Verdana,"Segoe UI",system-ui,sans-serif;
+    background:radial-gradient(900px 400px at 110% -10%,rgba(192,38,211,.08),transparent 60%),
+               radial-gradient(800px 420px at -10% 0%,rgba(124,58,237,.08),transparent 60%),var(--lilac);
+    color:var(--ink);line-height:1.55;min-height:100vh;display:flex;flex-direction:column}
+  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .head-in{max-width:840px;margin:0 auto;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.05rem}
+  .logo .dot{width:26px;height:26px;border-radius:50%;background:conic-gradient(from 210deg,var(--brand1),var(--brand2),var(--brand1));box-shadow:inset 0 0 0 5px #fff,inset 0 0 0 7px rgba(124,58,237,.35)}
+  .logo b{background:linear-gradient(90deg,var(--brand1),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .head-btns{margin-left:auto;display:flex;gap:.5rem}
+  .hbtn{border:1.5px solid var(--line);background:#fff;color:var(--purple-dark);font-weight:700;font-size:.92rem;padding:.5rem .85rem;border-radius:999px;cursor:pointer}
+  .hbtn:hover{border-color:var(--brand2)}
+  main{flex:1;width:100%;max-width:840px;margin:0 auto;padding:1.4rem 1rem 3rem}
+  footer{border-top:1px solid var(--line);background:#fff}
+  .foot-in{max-width:840px;margin:0 auto;padding:.9rem 1rem;font-size:.95rem;color:var(--ink-soft)}
+  .foot-in b{color:var(--ink)}
+  /* home */
+  .hero{padding:1.2rem 0 .9rem}
+  .hero h1{font-size:clamp(1.7rem,4.6vw,2.4rem);line-height:1.15;font-weight:800}
+  .hero h1 span{background:linear-gradient(90deg,var(--brand1),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:.6rem;color:var(--ink-soft);max-width:58ch;font-size:1.05rem}
+  .featcard{border:2px solid transparent;border-radius:var(--radius);padding:1.1rem 1.1rem 1rem;margin-top:1.1rem;
+    background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,var(--brand1),var(--brand2)) border-box;box-shadow:var(--shadow)}
+  .featcard h2{font-size:1.25rem}
+  .featcard p{color:var(--ink-soft);margin:.35rem 0 .7rem;font-size:.98rem}
+  .taskchips{display:flex;flex-wrap:wrap;gap:.45rem;margin:.4rem 0 .9rem}
+  .tchip{border:1.5px solid var(--line);background:#fbf9fe;border-radius:999px;padding:.28rem .75rem;font-size:.85rem;font-weight:700;color:var(--ink-soft);cursor:pointer}
+  .tchip:hover{border-color:var(--brand2);color:var(--purple-dark)}
+  .tchip.done{border-color:#bfe5cb;background:var(--green-bg);color:var(--green)}
+  .pathlist{display:flex;flex-direction:column;gap:.7rem;margin-top:1.2rem}
+  .mcard{display:flex;align-items:center;gap:.95rem;text-align:left;width:100%;background:var(--card);border:1.5px solid var(--line);
+    border-radius:var(--radius);padding:.95rem 1rem;cursor:pointer;box-shadow:var(--shadow);transition:.12s;font:inherit;color:inherit}
+  .mcard:hover{transform:translateY(-2px);border-color:#cdb6ec}
+  .mnum{flex:0 0 46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.15rem;color:#fff;
+    background:linear-gradient(135deg,var(--brand1),var(--brand2));font-variant-numeric:tabular-nums}
+  .mcard.done .mnum{background:var(--green)}
+  .mtxt{flex:1;min-width:0}.mtxt h3{font-size:1.05rem;line-height:1.3}.mtxt p{font-size:.92rem;color:var(--ink-soft);margin-top:.1rem}
+  .mgo{flex:0 0 auto;color:var(--brand2);font-weight:800;font-size:1.3rem}.mcard.done .mgo{color:var(--green)}
+  .home-extra{display:flex;gap:.7rem;margin-top:1.2rem;flex-wrap:wrap}
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:none;border-radius:999px;cursor:pointer;font:inherit;font-weight:800;
+    padding:.8rem 1.4rem;font-size:1.02rem;transition:filter .12s,transform .12s}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#fff;box-shadow:0 6px 18px rgba(124,58,237,.35)}
+  .btn-primary:hover{filter:brightness(1.06)}
+  .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--purple-dark)}
+  .btn-ghost:hover{border-color:var(--brand2)}
+  .btn:disabled{background:#d9d3e6;color:#8b84a3;box-shadow:none;cursor:not-allowed;filter:none}
+  /* module steps */
+  .crumb{display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem;flex-wrap:wrap}
+  .crumb .back{background:none;border:none;color:var(--brand2);font-weight:800;cursor:pointer;font-size:1rem;padding:.3rem .2rem}
+  .crumb .where{color:var(--ink-soft);font-size:.95rem}
+  .stepbar{height:9px;background:#e9e2f4;border-radius:99px;overflow:hidden;margin:.3rem 0 1rem}
+  .stepbar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand1),var(--brand2));border-radius:99px;transition:width .3s}
+  .stepmeta{font-size:.92rem;color:var(--ink-soft);font-weight:700;font-variant-numeric:tabular-nums}
+  .stepcard{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.3rem 1.2rem;margin-top:.5rem}
+  .stepcard h2{font-size:1.32rem;line-height:1.25;margin-bottom:.7rem}
+  .stepcard p{margin:.55rem 0;font-size:1.03rem}
+  .stepcard ul,.stepcard ol{margin:.55rem 0 .55rem 1.3rem;font-size:1.03rem}
+  .stepcard li{margin:.3rem 0}
+  .navrow{display:flex;justify-content:space-between;gap:.7rem;margin-top:1.3rem;flex-wrap:wrap}
+  .tip,.warn,.note{border-radius:14px;padding:.75rem .9rem;margin:.8rem 0;font-size:.97rem}
+  .tip{background:#f4ecff;border:1.5px solid #ddc9f7}
+  .warn{background:var(--amber-bg);border:1.5px solid #f3d9a4}
+  .note{background:var(--blue-bg);border:1.5px solid #c3d6fb}
+  .tip b,.warn b,.note b{display:block;margin-bottom:.15rem}
+  kbd.app{display:inline-block;background:var(--purple);color:#fff;border-radius:999px;padding:.08rem .65rem;font-weight:800;font-family:inherit;font-size:.92em;white-space:nowrap}
+  kbd.appghost{display:inline-block;background:#fff;border:1.6px solid var(--purple);color:var(--purple-dark);border-radius:999px;padding:.05rem .6rem;font-weight:800;font-family:inherit;font-size:.92em;white-space:nowrap}
+  .badge{display:inline-block;border:1.3px solid #b9b2c9;border-radius:5px;padding:0 .32rem;font-size:.72em;font-weight:800;color:var(--ink-soft);background:#fff}
+  .launch{margin-top:1rem}
+  /* symbol cards & game */
+  .pad{border:1.5px solid var(--line);border-radius:16px;background:#fbf9fe;padding:1rem;margin:.9rem 0}
+  .pad-title{font-size:.85rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--brand2);margin-bottom:.7rem}
+  .symgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.7rem;margin:.8rem 0}
+  .symcard{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:.8rem;display:flex;gap:.7rem;align-items:flex-start}
+  .symcard .ic{flex:0 0 44px}.symcard h4{font-size:.98rem}.symcard p{font-size:.9rem;color:var(--ink-soft);margin:.1rem 0 0}
+  .game-q{font-weight:800;font-size:1.05rem;margin:.6rem 0;color:var(--purple-dark)}
+  .gamerow{display:flex;flex-wrap:wrap;gap:.6rem}
+  .gbtn{background:#fff;border:2px solid var(--line);border-radius:14px;padding:.6rem;cursor:pointer;width:74px;height:74px;display:flex;align-items:center;justify-content:center;transition:border-color .12s}
+  .gbtn:hover{border-color:var(--brand2)}
+  .gbtn.right{border-color:var(--green);background:var(--green-bg)}
+  .gbtn.wrong{border-color:var(--red);background:var(--red-bg);animation:shake .3s}
+  @keyframes shake{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-3px)}}
+  .game-fb{min-height:1.6rem;font-weight:800;margin-top:.5rem}
+  .game-fb.good{color:var(--green)}.game-fb.bad{color:var(--red)}
+  /* quiz */
+  .qopt{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:.8rem .9rem;margin:.5rem 0;font:inherit;font-size:1.02rem;cursor:pointer;color:var(--ink)}
+  .qopt:hover{border-color:var(--brand2)}
+  .qopt.correct{border-color:var(--green);background:var(--green-bg);font-weight:800}
+  .qopt.incorrect{border-color:var(--red);background:var(--red-bg)}
+  .qexp{margin-top:.6rem;font-size:.98rem}
+  .scorebig{font-size:2.4rem;font-weight:800;background:linear-gradient(90deg,var(--brand1),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* cheat sheet */
+  .cheat h2{font-size:1.5rem;margin-bottom:.3rem}
+  .cheatgrid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:1rem}
+  .cheatbox{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:.9rem;break-inside:avoid}
+  .cheatbox h3{font-size:1rem;color:var(--purple-dark);margin-bottom:.4rem}
+  .cheatbox ol,.cheatbox ul{margin-left:1.15rem;font-size:.93rem}
+  .cheatbox li{margin:.22rem 0}
+  .symline{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;font-size:.93rem}
+  .symline .ic{flex:0 0 30px}
+  /* ===== practice tablet (Camascope replica) ===== */
+  .coach{position:sticky;top:62px;z-index:15;background:linear-gradient(95deg,var(--brand1),var(--brand2));color:#fff;border-radius:14px;
+    padding:.65rem .85rem;display:flex;gap:.6rem;align-items:center;box-shadow:0 8px 20px rgba(124,58,237,.35);margin-bottom:.8rem}
+  .coach .cico{font-size:1.35rem}
+  .coach .ctxt{flex:1;font-weight:700;font-size:.97rem;line-height:1.35}
+  .coach .cbtn{border:none;background:#fff;color:var(--purple-dark);font-weight:800;border-radius:999px;padding:.4rem .9rem;cursor:pointer;font-size:.9rem}
+  .tabfr{background:#141026;border-radius:26px;padding:10px;box-shadow:var(--shadow)}
+  .tab{background:#fff;border-radius:18px;overflow:hidden;min-height:540px;display:flex;flex-direction:column;position:relative}
+  .sbar{display:flex;justify-content:space-between;font-size:.7rem;color:#666;padding:.22rem .7rem;background:#fff}
+  .abar{display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;border-bottom:1px solid #eee}
+  .burger{font-size:1.3rem;cursor:pointer;padding:.05rem .35rem;border-radius:8px;line-height:1}
+  .adot{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 210deg,var(--brand1),var(--brand2),var(--brand1));box-shadow:inset 0 0 0 4px #fff;flex:0 0 22px}
+  .ward{font-weight:800;font-size:.92rem}
+  .aright{margin-left:auto;display:flex;gap:.7rem;align-items:flex-end}
+  .aitem{display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;font-size:.58rem;color:var(--ink-soft);font-weight:700}
+  .uav{width:20px;height:20px;border-radius:50%;background:var(--purple-dark);color:#fff;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .filters{display:flex;gap:.32rem;padding:.45rem .6rem;flex-wrap:wrap;border-bottom:1px solid #f1eef7}
+  .ftile{border:1.3px solid var(--brand2);color:var(--purple-dark);border-radius:7px;padding:.06rem .45rem;font-size:.68rem;font-weight:800;background:#fff}
+  .ftile.sel{background:var(--purple);color:#fff;border-color:var(--purple)}
+  .srow{display:flex;align-items:center;gap:.55rem;padding:.35rem .6rem;font-size:.75rem;color:var(--ink-soft);border-bottom:1px solid #f1eef7;font-weight:700}
+  .tgl{width:32px;height:17px;border-radius:99px;background:#d9d4e6;position:relative;display:inline-block}
+  .tgl::after{content:'';position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .gridwrap{overflow-x:auto;flex:1}
+  .marg{display:grid;grid-template-columns:168px repeat(5,minmax(72px,1fr));min-width:600px;font-size:.76rem}
+  .gh{background:#efe9f7;padding:.4rem .2rem;text-align:center;font-weight:800;color:var(--ink-soft);font-size:.74rem}
+  .gh.cur{background:#7a4bd0;color:#fff}
+  .gh.first{background:#fff}
+  .rstrip{grid-column:1/-1;font-size:.68rem;font-weight:800;padding:.16rem .6rem}
+  .rstrip.sch{background:#fff6e3;color:#8a6100}
+  .rstrip.abs{background:#e9ebf1;color:#5a6072}
+  .rstrip.skp{background:#ffefe0;color:#b45309}
+  .pcell{display:flex;gap:.4rem;padding:.4rem .45rem;border-bottom:1px solid #f4f1fa;background:#fff;align-items:flex-start}
+  .pava{width:32px;height:32px;flex:0 0 32px;border-radius:8px;background:#e9def6;display:flex;align-items:center;justify-content:center;color:var(--purple-dark);font-weight:800;font-size:.72rem}
+  .pmeta{min-width:0}
+  .pname{font-weight:800;color:var(--ink);font-size:.78rem;line-height:1.2}
+  .psub{color:var(--ink-soft);font-size:.65rem}
+  .ptags{margin-top:.15rem;display:flex;gap:.2rem}
+  .proom{margin-left:auto;font-weight:800;font-size:.72rem}
+  .cell{border-bottom:1px solid #f4f1fa;border-left:1px solid #f8f5fc;display:flex;align-items:center;justify-content:center;gap:.45rem;padding:.3rem .15rem;background:#fff;flex-wrap:wrap}
+  .cell.cur{background:#f3edfa}
+  .cell.tap{cursor:pointer}
+  .cico{position:relative;display:inline-flex}
+  .cico .n{position:absolute;right:-7px;bottom:-4px;font-size:.6rem;font-weight:800}
+  .pulse{outline:3px solid #e11dc0;outline-offset:2px;animation:pul 1.3s infinite;border-radius:12px}
+  @keyframes pul{0%,100%{box-shadow:0 0 0 0 rgba(225,29,192,.5)}55%{box-shadow:0 0 0 10px rgba(225,29,192,0)}}
+  /* login screens */
+  .lg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.2rem;gap:.5rem}
+  .lg .biglogo{display:flex;align-items:center;gap:.4rem;font-weight:800;font-size:1.1rem;margin-bottom:.4rem}
+  .lg h3{font-size:1.5rem;line-height:1.25;font-weight:800}
+  .lg h3 .pk{color:var(--brand1)}
+  .lg .cap{font-size:.72rem;color:var(--ink-soft)}
+  .lg .lfld{width:min(260px,100%);text-align:left}
+  .lg .lfld label{font-size:.72rem;font-weight:800;color:var(--ink-soft)}
+  .lg input,.lg select{width:100%;border:1.6px solid var(--line);border-radius:10px;padding:.55rem .65rem;font:inherit;font-size:.95rem}
+  .lg input:focus,.lg select:focus{outline:3px solid #e6d6fb;border-color:var(--brand2)}
+  .pill{background:var(--purple);color:#fff;border:none;border-radius:999px;padding:.55rem 1.6rem;font-weight:800;font-size:.95rem;cursor:pointer}
+  .pill:disabled{background:#d9d3e6;color:#928aa9;cursor:not-allowed}
+  .radios{width:min(260px,100%);text-align:left;font-size:.9rem}
+  .radios label{display:flex;gap:.5rem;align-items:center;padding:.3rem 0;font-weight:700;cursor:pointer}
+  .homeicons{flex:1;background:#14102a;display:flex;align-items:center;justify-content:center;gap:2rem;border-radius:0 0 18px 18px}
+  .hicon{text-align:center;color:#cfc8e8;font-size:.72rem;font-weight:700;cursor:pointer;padding:.5rem;border-radius:14px}
+  .hicon .sq{width:58px;height:58px;border-radius:14px;margin:0 auto .3rem;display:flex;align-items:center;justify-content:center;background:#fff}
+  .hicon.old .sq{background:#241d44}
+  .hicon .ring{width:30px;height:30px;border-radius:50%;background:conic-gradient(from 210deg,#f0abfc,#a855f7,#f0abfc);box-shadow:inset 0 0 0 6px rgba(255,255,255,.92)}
+  .hicon.old .ring{box-shadow:inset 0 0 0 6px rgba(20,16,42,.92)}
+  .spin{width:34px;height:34px;border:4px solid #e6ddf2;border-top-color:var(--brand2);border-radius:50%;animation:sp 1s linear infinite;margin:.6rem auto}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  /* person view */
+  .pv{display:flex;flex:1;min-height:0}
+  .pv-left{flex:0 0 178px;border-right:1px solid #f0ecf7;padding:.55rem .6rem;font-size:.75rem;overflow:auto}
+  .pv-back{cursor:pointer;font-weight:800;color:var(--ink-soft);font-size:1rem;display:inline-block;padding:.05rem .4rem;border-radius:8px}
+  .pv-name{font-weight:800;font-size:.85rem;margin-top:.15rem}
+  .bigava{width:110px;height:110px;border-radius:12px;margin:.5rem auto;background:#e9def6;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .ph{color:var(--purple-dark);font-weight:800;margin-top:.5rem;font-size:.76rem}
+  .pv-right{flex:1;display:flex;flex-direction:column;min-width:0}
+  .ptabs{display:flex;gap:.9rem;padding:.45rem .8rem;border-bottom:1px solid #eee;font-weight:700;color:var(--ink-soft);font-size:.8rem}
+  .ptabs .cur{color:var(--ink);border-bottom:3px solid var(--purple-dark);padding-bottom:.15rem}
+  .medlist{flex:1;overflow:auto;padding:.4rem .55rem .2rem}
+  .mc{border:1px solid #eee;border-radius:10px;margin:.45rem 0;overflow:hidden;background:#fff}
+  .mstrip{display:flex;justify-content:space-between;align-items:center;font-size:.65rem;font-weight:800;padding:.14rem .5rem}
+  .mstrip.pend{background:#fff6e3;color:#8a6100}
+  .mstrip.take{background:#e7f6ec;color:var(--green)}
+  .mstrip.skp{background:#ffefe0;color:#b45309}
+  .mstrip.prn{background:#e9f0fe;color:var(--blue)}
+  .mstrip .stk{color:var(--ink-soft);font-weight:700}
+  .mbody{padding:.35rem .55rem .5rem}
+  .mn{font-weight:800;font-size:.82rem}
+  .mi{font-size:.7rem;color:var(--ink-soft)}
+  .mline{display:flex;align-items:center;gap:.4rem;margin-top:.25rem;font-size:.66rem;flex-wrap:wrap}
+  .lchip{background:#2f6fed;color:#fff;border-radius:4px;padding:.03rem .32rem;font-weight:800}
+  .lchip.red{background:#dc2626}
+  .okgreen{color:var(--green);font-weight:800}
+  .moreinfo{margin-left:auto;color:var(--blue);font-weight:800;font-size:.68rem;cursor:pointer;white-space:nowrap}
+  .fchip{border:1.4px solid #2f6fed;color:#2f6fed;border-radius:5px;padding:.02rem .32rem;font-weight:800;cursor:pointer;background:#fff}
+  .fchip.doneflag{border-color:#bfe5cb;color:var(--green);cursor:default}
+  .prndiv{display:flex;justify-content:center;margin:.5rem 0 .2rem}
+  .prndiv span{border:1.5px solid var(--blue);color:var(--blue);font-weight:800;font-size:.7rem;border-radius:6px;padding:.05rem .5rem;background:#fff}
+  .pbot{display:flex;gap:.55rem;padding:.5rem .6rem;border-top:1px solid #eee}
+  .abtn{flex:1;border-radius:999px;padding:.5rem;font-weight:800;font-size:.82rem;cursor:pointer;border:none}
+  .abtn.outline{background:#fff;border:1.6px solid var(--purple);color:var(--purple-dark)}
+  .abtn.solid{background:var(--purple);color:#fff}
+  .abtn:disabled{background:#e2d9f1;color:#9d92b8;border:none;cursor:not-allowed}
+  /* sheets & drawer */
+  .sheet{position:absolute;inset:0;background:rgba(24,16,48,.38);display:flex;align-items:flex-end;justify-content:center;z-index:6}
+  .shcard{background:#fff;width:100%;max-height:90%;overflow:auto;border-radius:16px 16px 0 0;padding:.75rem .85rem .95rem;font-size:.85rem}
+  .shcard h4{text-align:center;font-size:.98rem}
+  .shcard .mand{text-align:center;font-size:.68rem;color:var(--blue);margin-bottom:.5rem;font-weight:700}
+  .fld{margin:.5rem 0}
+  .fld label{display:block;font-weight:800;font-size:.76rem;margin-bottom:.18rem}
+  .fld label .req{color:var(--red)}
+  .fld input,.fld select,.fld textarea{width:100%;border:1.6px solid var(--line);border-radius:10px;padding:.5rem .6rem;font:inherit;font-size:.9rem;background:#fff;color:var(--ink)}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{outline:3px solid #e6d6fb;border-color:var(--brand2)}
+  .fld .hint{font-size:.7rem;color:var(--ink-soft);margin-top:.12rem}
+  .vban{background:#e9f0fe;color:#1d4ed8;font-size:.74rem;padding:.35rem .55rem;border-radius:8px;font-weight:700;margin:.3rem 0 .5rem}
+  .posrow{display:flex;gap:.4rem;flex-wrap:wrap}
+  .posbtn{border:1.4px solid #c9c2da;padding:.35rem .6rem;border-radius:8px;font-weight:800;font-size:.74rem;background:#fff;cursor:pointer}
+  .posbtn.sel{background:var(--purple);color:#fff;border-color:var(--purple)}
+  .chip-witness{display:inline-flex;align-items:center;gap:.35rem;background:var(--green-bg);color:var(--green);font-weight:800;border-radius:999px;padding:.22rem .7rem;margin:.3rem 0;font-size:.8rem}
+  .drawer{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:7;display:flex}
+  .dpanel{width:180px;height:100%;background:#fff;padding:.7rem .6rem;font-size:.8rem;display:flex;flex-direction:column;gap:.15rem}
+  .dpanel .dname{font-weight:800;font-size:.9rem;margin-bottom:.15rem}
+  .dpanel .dsub{color:var(--ink-soft);font-size:.66rem;margin-bottom:.5rem}
+  .ditem{padding:.45rem .4rem;border-radius:8px;font-weight:700;color:var(--ink);cursor:pointer}
+  .ditem:hover{background:#f4eefc}
+  .dfoot{margin-top:auto;font-size:.6rem;color:#9a94ad}
+  .endwrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.2rem;gap:.4rem}
+  .endwrap h3{font-size:1.5rem}
+  .endwrap ul{list-style:none;text-align:left;font-size:.9rem;margin:.5rem 0}
+  .endwrap li{margin:.25rem 0;font-weight:700;color:var(--ink-soft)}
+  .pager{display:flex;align-items:center;justify-content:center;gap:.6rem;font-weight:800;font-size:.78rem;color:var(--ink-soft);padding:.25rem 0 .05rem}
+  .pager span{cursor:pointer;padding:0 .35rem}
+  .timechip{display:flex;justify-content:center;margin:.35rem 0 .05rem}
+  .timechip b{border:1.5px solid var(--blue);color:var(--blue);border-radius:8px;padding:.06rem .6rem;font-size:.72rem;font-weight:800;background:#fff}
+  .detwrap{flex:1;overflow:auto;padding:.35rem .6rem .6rem;font-size:.82rem}
+  .dethead{border-bottom:1px solid #f0ecf7;padding-bottom:.35rem;margin-bottom:.35rem}
+  .formtitle{text-align:center;font-weight:800;font-size:.95rem;margin-top:.35rem}
+  .mand{text-align:center;font-size:.68rem;color:var(--blue);margin-bottom:.4rem;font-weight:700}
+  .dtline{display:flex;align-items:center;gap:.5rem;font-size:.84rem;font-weight:600}
+  .pen{cursor:pointer}
+  .noterow{position:relative}
+  .noterow .mic{position:absolute;right:.5rem;bottom:.55rem;cursor:pointer;font-size:.9rem}
+  .brow{display:flex;gap:.5rem;align-items:center;margin-top:.7rem}
+  .ig{color:var(--ink-soft);font-weight:700;font-size:.78rem;cursor:pointer;padding:.3rem .15rem}
+  .brow .sk{flex:0 0 auto;min-width:86px}
+  .brow .tk{flex:1}
+  .wmodal{position:absolute;inset:0;background:rgba(24,16,48,.42);display:flex;align-items:center;justify-content:center;z-index:8;padding:1rem}
+  .wcard{background:#fff;border-radius:14px;padding:.9rem;width:min(300px,92%);box-shadow:0 16px 40px rgba(40,20,80,.35);font-size:.85rem}
+  .wcard h4{font-size:.95rem}
+  .wcard .sub{font-size:.72rem;color:var(--ink-soft);margin:.15rem 0 .5rem}
+  .histrow{border:1.5px solid #bfe5cb;border-radius:8px;padding:.35rem .5rem;margin:.35rem 0;font-size:.74rem}
+  .histrow b{color:var(--green)}
+  .witchip{display:inline-flex;align-items:center;gap:.35rem;font-weight:800;font-size:.78rem;color:var(--ink);margin:.3rem 0}
+  .popc{position:absolute;inset:0;background:rgba(24,16,48,.42);display:flex;align-items:center;justify-content:center;z-index:9;padding:1rem}
+  .popcard{background:#fff;border-radius:14px;padding:.85rem .9rem;width:min(300px,92%);box-shadow:0 16px 40px rgba(40,20,80,.35);font-size:.83rem;text-align:center}
+  .popcard h5{font-size:.9rem;margin-bottom:.25rem}
+  .popcard p{font-size:.78rem;color:var(--ink-soft);margin-bottom:.6rem}
+  .poprow{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
+  .linkbtn{background:none;border:none;color:var(--purple-dark);font-weight:800;cursor:pointer;font-size:.8rem;padding:.35rem .5rem}
+  .sulist{flex:1;overflow:auto;padding:.5rem .6rem}
+  .sugrid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .sucard{border:1.5px solid #eee;border-radius:10px;padding:.5rem .55rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;background:#fff}
+  .sucard .pava{width:30px;height:30px;flex:0 0 30px}
+  .sucard .nm{font-weight:800;font-size:.74rem;line-height:1.15}
+  .sucard .dt{font-size:.6rem;color:var(--ink-soft)}
+  .sucard .rm{margin-left:auto;font-weight:800;font-size:.7rem}
+  .profgrid{display:grid;grid-template-columns:1fr 1fr;gap:.3rem .8rem;font-size:.76rem;padding:.45rem .2rem}
+  .profgrid b{display:block;font-size:.64rem;color:var(--ink-soft)}
+  .activechip{background:var(--green-bg);color:var(--green);font-weight:800;font-size:.6rem;border-radius:5px;padding:.05rem .35rem}
+  .snapview{flex:1;background:#1a1430;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;border-radius:0 0 18px 18px}
+  .frame{width:150px;height:190px;border:3px dashed #b79bd8;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#241d44}
+  .shutter{width:56px;height:56px;border-radius:50%;background:#fff;border:5px solid #b79bd8;cursor:pointer}
+  .newbadge{background:var(--blue-bg);color:var(--blue);font-weight:800;font-size:.64rem;border-radius:5px;padding:.05rem .4rem;display:inline-block}
+  .bmwrap{display:flex;gap:.7rem;align-items:flex-start;margin:.3rem 0}
+  .bmfig{position:relative;flex:0 0 100px;text-align:center}
+  .bmchip{position:absolute;font-size:.52rem;font-weight:800;border-radius:4px;padding:.04rem .25rem;color:#fff;line-height:1.15;text-align:center}
+  .bmopts{flex:1}
+  .bmopt{display:flex;align-items:center;gap:.4rem;border:1.5px solid #eee;border-radius:9px;padding:.42rem .5rem;margin:.35rem 0;cursor:pointer;font-size:.75rem;font-weight:700}
+  .bmopt.sel{border-color:var(--purple);background:#f6f0ff}
+  .sugg{color:var(--brand1);font-weight:800;font-size:.6rem;margin-left:auto}
+  .fbtabs{display:flex;gap:.4rem;margin:.3rem 0;justify-content:center}
+  .fbtab{border:1.4px solid #c9c2da;border-radius:8px;padding:.15rem .7rem;font-size:.7rem;font-weight:800;background:#fff;cursor:pointer}
+  .fbtab.sel{background:var(--purple-dark);color:#fff;border-color:var(--purple-dark)}
+  /* ===== practice PORTAL (browser replica) ===== */
+  .bbar{display:flex;align-items:center;gap:.5rem;background:#e8e6ef;padding:.32rem .6rem;font-size:.75rem;color:#6a6580;border-radius:18px 18px 0 0}
+  .burl{flex:1;background:#fff;border-radius:99px;padding:.24rem .7rem;font-weight:700;color:var(--ink);cursor:pointer;font-size:.72rem;text-align:left}
+  .pnav{display:flex;align-items:center;gap:.6rem;background:#10162c;color:#fff;padding:.45rem .7rem;font-size:.74rem;position:relative;flex-wrap:wrap}
+  .pnav b{font-size:.85rem}
+  .pnavi{cursor:pointer;font-weight:700;padding:.15rem .3rem;border-radius:8px;white-space:nowrap}
+  .pnsearch{border:none;border-radius:99px;padding:.2rem .6rem;font-size:.7rem;width:86px}
+  .pini{width:24px;height:24px;border-radius:50%;background:#7a4bd0;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.6rem;cursor:pointer}
+  .pdrop{position:absolute;top:36px;background:#fff;color:var(--ink);border-radius:10px;box-shadow:0 14px 34px rgba(20,10,50,.35);padding:.35rem;z-index:9;min-width:172px;font-size:.76rem}
+  .pdhead{font-weight:800;color:var(--purple-dark);padding:.25rem .4rem;font-size:.66rem}
+  .pditem{padding:.34rem .5rem;border-radius:7px;font-weight:600;cursor:pointer}
+  .pditem:hover{background:#f4eefc}
+  .pwrap{flex:1;overflow:auto;padding:.5rem .6rem;font-size:.78rem;position:relative}
+  .dtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+  .dtile{--tc:#7a4bd0;border:1px solid #eee;border-radius:9px;overflow:hidden;cursor:pointer;background:#fff}
+  .dtile .tl{display:block;background:var(--tc);color:#fff;font-weight:800;font-size:.6rem;padding:.15rem .4rem}
+  .dtile .tn{font-size:1.05rem;font-weight:800;padding:.08rem .4rem 0;display:inline-block}
+  .dtile .ts{font-size:.56rem;color:var(--ink-soft);display:block;padding:0 .4rem .2rem}
+  .dbars{display:flex;align-items:flex-end;gap:3px;height:52px;background:#fff;border:1px solid #eee;border-radius:9px;padding:.3rem .4rem;margin:.4rem 0}
+  .dbars i{flex:1;background:#19c39c;border-radius:2px 2px 0 0}
+  .dpanels{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+  .dpan{border:1px solid #eee;border-radius:9px;background:#fff;padding:.35rem .45rem;cursor:pointer;font-size:.68rem}
+  .dpan b{display:block;font-size:.66rem;color:var(--purple-dark);margin-bottom:.15rem}
+  .drow{display:flex;justify-content:space-between;padding:.1rem 0}
+  .drow span{color:var(--ink-soft)}
+  .pchip{display:inline-block;background:#efe9f7;color:var(--purple-dark);border-radius:5px;padding:.02rem .35rem;font-weight:800;font-size:.6rem}
+  .pchip.orange{background:#fdebd3;color:#c2410c}
+  .pchip.green{background:var(--green-bg);color:var(--green)}
+  .pchip.red{background:var(--red-bg);color:var(--red)}
+  .pbtn{border-radius:8px;border:none;padding:.32rem .7rem;font-weight:800;font-size:.7rem;cursor:pointer}
+  .pbtn.solid{background:var(--purple);color:#fff}
+  .pbtn.outline{background:#fff;border:1.4px solid var(--purple);color:var(--purple-dark)}
+  .pbtn.danger{background:#fff;border:1.4px solid #dc2626;color:#dc2626}
+  .pbtn.orangeb{background:#fff;border:1.4px solid #e07b12;color:#c2410c}
+  .pbtn:disabled{background:#e2ddef;color:#9d92b8;border:none;cursor:not-allowed}
+  .phead{padding:.2rem 0 .35rem;border-bottom:1px solid #f0ecf7;margin-bottom:.35rem}
+  .pthead{display:flex;gap:.5rem;font-weight:800;color:var(--ink-soft);font-size:.62rem;padding:.2rem 0;border-bottom:1px solid #eee}
+  .prow{display:flex;gap:.5rem;align-items:center;padding:.4rem 0;border-bottom:1px solid #f4f1fa}
+  .prow .pm{flex:1;min-width:0}
+  .pms{font-size:.66rem;color:var(--ink-soft)}
+  .pq{width:60px;font-weight:700;font-size:.68rem}
+  .pqin{width:56px;border:1.4px solid var(--line);border-radius:7px;padding:.24rem .3rem;font:inherit;font-size:.72rem;text-align:center}
+  .plink{color:var(--brand2);font-weight:700;font-size:.66rem;cursor:pointer;white-space:nowrap}
+  .citabs{display:flex;gap:.8rem;font-weight:700;color:var(--ink-soft);font-size:.66rem;border-bottom:1px solid #eee;padding:.25rem 0;flex-wrap:wrap}
+  .citabs .cur{color:var(--ink);border-bottom:2.5px solid var(--purple-dark)}
+  .citabs span{cursor:pointer}
+  .rtabs{display:flex;gap:.6rem;align-items:center;border-bottom:1px solid #eee;padding:.25rem 0;flex-wrap:wrap}
+  .rtab{font-weight:700;color:var(--ink-soft);font-size:.7rem;cursor:pointer;padding-bottom:.1rem}
+  .rtab.cur{color:var(--ink);border-bottom:2.5px solid var(--purple-dark)}
+  .pbox{border:1px solid #eee;border-radius:9px;background:#fff;padding:.4rem .5rem;margin:.35rem 0}
+  .pgrid{display:grid;grid-template-columns:auto 1fr;gap:.15rem .8rem;font-size:.7rem;margin-top:.2rem}
+  .pgrid span:nth-child(odd){color:var(--ink-soft);font-weight:700}
+  .ckgrid{display:grid;grid-template-columns:1fr 1fr;gap:.18rem .6rem;margin-top:.2rem}
+  .ckbx{display:flex;gap:.35rem;align-items:center;font-size:.7rem;font-weight:600;cursor:pointer}
+  .clsplit{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .calmini{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.25rem}
+  .calmini span{border:1px solid #cdd6f4;background:#eef2ff;color:#1d4ed8;border-radius:5px;padding:.06rem .3rem;font-size:.6rem;font-weight:800}
+  .calmini.big span{font-size:.68rem;padding:.12rem .4rem}
+  .destopt{cursor:pointer;font-weight:700;font-size:.7rem;color:var(--ink-soft);padding:.1rem .3rem;border-radius:6px}
+  .destopt.sel{color:var(--purple-dark);background:#f4eefc}
+  .plsplit{display:flex;gap:.5rem;min-height:100%}
+  .leftlist{flex:0 0 150px;border-right:1px solid #f0ecf7;padding-right:.4rem;font-size:.7rem}
+  .lli{border:1px solid #eee;border-radius:8px;padding:.32rem .4rem;margin:.3rem 0;cursor:pointer;font-weight:700}
+  .lli.sel{border-color:var(--purple);background:#f6f0ff}
+  .lls{font-weight:600;color:var(--ink-soft);font-size:.6rem}
+  .rmain{flex:1}
+  .adbox{border:1.5px dashed #cdb6ec;border-radius:9px;padding:.4rem .5rem;margin:.4rem 0;background:#fdfbff}
+  .pcardc{max-width:300px;margin:.6rem auto;border:1px solid #eee;border-radius:12px;padding:.7rem .8rem;background:#fff;box-shadow:var(--shadow)}
+  .marhead{background:#10162c;color:#fff;padding:.35rem .5rem;border-radius:8px 8px 0 0;font-size:.72rem;margin-top:.4rem}
+  .marrow{display:flex;gap:.2rem;margin-top:.25rem;flex-wrap:wrap}
+  .marcell{width:22px;height:22px;border:1px solid #ddd;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800}
+  .marcell.ok{color:var(--green);border-color:#bfe5cb;background:var(--green-bg)}
+  .marcell.x{color:#c2410c;background:var(--amber-bg);border-color:#f3d9a4}
+  .marcell.miss{color:var(--red);background:var(--red-bg);border-color:#f3b9b9}
+  .parthead{margin:1.5rem 0 .2rem;font-size:1.02rem;color:var(--purple-dark);font-weight:800;letter-spacing:.3px}
+  /* ===== mobile readability ===== */
+  @media (max-width:640px){
+    .head-in{gap:.4rem;flex-wrap:nowrap}
+    .logo{font-size:.92rem}.logo .dot{width:22px;height:22px}
+    .hbtn{padding:.35rem .55rem;font-size:.78rem}
+    .coach{top:50px;padding:.55rem .7rem}
+    .coach .ctxt{font-size:.88rem}
+    .tabfr{padding:6px;border-radius:20px}
+    .tab input,.tab select,.tab textarea{font-size:16px}
+    .gridwrap,.pwrap{-webkit-overflow-scrolling:touch}
+    .pv{flex-direction:column}
+    .pv-left{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:.1rem .8rem;border-right:none;border-bottom:1px solid #f0ecf7;padding:.45rem .6rem}
+    .pv-left .pv-name{margin-top:0}
+    .pv-left .psub{width:100%;margin:-.05rem 0 .1rem}
+    .pv-left .bigava{width:50px;height:50px;margin:0;border-radius:10px}
+    .pv-left .bigava svg{width:40px;height:40px}
+    .pv-left .ph{margin-top:0}
+    .medlist{padding:.4rem .5rem .2rem}
+    .plsplit{flex-direction:column}
+    .leftlist{flex:none;display:flex;gap:.4rem;overflow-x:auto;border-right:none;border-bottom:1px solid #f0ecf7;padding:0 0 .4rem}
+    .leftlist b{display:none}
+    .lli{min-width:160px;flex:0 0 auto;margin:.15rem 0}
+    .clsplit,.dpanels{grid-template-columns:1fr}
+    .dtiles{grid-template-columns:repeat(2,1fr)}
+    .pnsearch{display:none}
+    .pnav{gap:.4rem;font-size:.7rem;padding:.4rem .5rem}
+    .pdrop{left:8px !important;right:8px !important;top:64px}
+    .pthead{display:none}
+    .prow{flex-wrap:wrap}
+    .prow .pm{flex:1 1 100%}
+    .pwrap{font-size:.82rem}
+    .pqin{width:64px}
+    .brow .sk{min-width:76px}
+  }
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:.7rem 1.2rem;border-radius:999px;font-weight:800;opacity:0;pointer-events:none;transition:.3s;z-index:60;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  .videolist{list-style:none;margin:.6rem 0 0}
+  .videolist li{margin:.45rem 0}
+  .videolist a{color:var(--brand2);font-weight:700;word-break:break-word}
+  @media (max-width:640px){html{font-size:16.5px}.cheatgrid{grid-template-columns:1fr}.pv-left{flex-basis:140px}}
+  @media print{header,footer,.no-print{display:none !important}body{background:#fff}main{max-width:100%;padding:0}.cheatbox{border:1px solid #ccc}}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+  :focus-visible{outline:3px solid var(--brand2);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <div class="logo"><span class="dot"></span>Cama<b>scope</b>&nbsp;Training</div>
+    <div class="head-btns">
+      <button class="hbtn" onclick="goHome()">🏠 Home</button>
+      <button class="hbtn" onclick="openCheat()">📄 Cheat sheet</button>
+    </div>
+  </div>
+</header>
+<main id="app" aria-live="polite"></main>
+<footer>
+  <div class="foot-in">
+    <b>Stuck? Camascope Support:</b> ☎ 020&nbsp;8638&nbsp;7291 &nbsp;·&nbsp; ✉ support@camascope.com<br>
+    Practice copy only — the residents are the demo people from Camascope's own guide, and nothing you tap changes any real records.
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ================= icons ================= */
+const IC = {
+  taken:s=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#16a34a" stroke-width="3.4"/><path d="M12.5 20.5l5 5 10-11" fill="none" stroke="#16a34a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  due:s=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#f59e0b" stroke-width="3.4"/><path d="M20 11v9l6.5 4" fill="none" stroke="#f59e0b" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  sched:s=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="8" width="24" height="24" rx="5" fill="none" stroke="#2f6fed" stroke-width="3.2"/><path d="M6 15h24M13 5v6M23 5v6" stroke="#2f6fed" stroke-width="3.2" stroke-linecap="round"/><circle cx="28" cy="28" r="8.5" fill="#fff" stroke="#2f6fed" stroke-width="3"/><path d="M28 24.5v3.7l2.6 1.7" fill="none" stroke="#2f6fed" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+  skip:s=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#ea8a0a" stroke-width="3.4"/><path d="M20 11v11" stroke="#ea8a0a" stroke-width="3.8" stroke-linecap="round"/><circle cx="20" cy="28.5" r="2.4" fill="#ea8a0a"/></svg>`,
+  missed:s=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#dc2626" stroke-width="3.4"/><path d="M20 12l8 13H12z" fill="#dc2626"/></svg>`,
+  prn:s=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#2f6fed" stroke-width="3.2"/><text x="20" y="24.5" font-size="11" font-weight="800" fill="#2f6fed" text-anchor="middle" font-family="inherit">PRN</text></svg>`
+};
+const ICCOL={taken:'#16a34a',due:'#f59e0b',sched:'#2f6fed',skip:'#ea8a0a',missed:'#dc2626',prn:'#2f6fed'};
+const wifiSvg=`<svg width="13" height="11" viewBox="0 0 24 20"><path d="M2 7a15 15 0 0 1 20 0M5.5 11a10 10 0 0 1 13 0M9 15a5 5 0 0 1 6 0" fill="none" stroke="#2f6fed" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="18" r="1.8" fill="#2f6fed"/></svg>`;
+const refSvg=`<svg width="12" height="12" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 3v5h-5" fill="none" stroke="#4a5273" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const calSvg=`<svg width="12" height="12" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="#4a5273" stroke-width="2.2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="#4a5273" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+const silSvg=`<svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true"><circle cx="32" cy="23" r="12" fill="#b79bd8"/><path d="M9 58c2.5-14 12.5-20 23-20s20.5 6 23 20" fill="#b79bd8"/></svg>`;
+function esc(x){return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function nowT(){const d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
+function todayStr(){const d=new Date(),m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return String(d.getDate()).padStart(2,"0")+"-"+m[d.getMonth()]+"-"+d.getFullYear()}
+function dayStr(){const d=new Date(),w=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return w[d.getDay()]+", "+d.getDate()+" "+m[d.getMonth()]}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600)}
+function nudge(m){toast(m||"Follow the pink highlight 💜")}
+
+/* ================= practice-tablet data ================= */
+const MEDS={
+ asp:{name:"Aspirin 75mg dispersible tablets",ins:"ONE to be taken daily",dose:"1.0",stock:"56.0"},
+ preg:{name:"Pregabalin 100mg capsules",ins:"ONE to be taken THREE TIMES DAILY",dose:"1.0",stock:"120.0",tags:["WIT","CD"]},
+ ram:{name:"Ramipril 10mg tablets",ins:"Take 1 daily",dose:"1.0",stock:"120.0",vital:true},
+ para:{name:"Paracetamol 500mg capsules",ins:"TWO to be taken up to FOUR times a day WHEN REQUIRED",dose:"2.0",stock:"400.0",prn:true},
+ avn:{name:"Aveeno Daily moisturising lotion (Johnson & Johnson Ltd)",ins:"Apply daily to full body daily",dose:"1.0",stock:"8.0",prn:true,body:true,tags:["NMT"]},
+ cod:{name:"Codeine 30mg tablets",ins:"ONE to be taken FOUR times DAILY for pain",dose:"1.0",stock:"224.0"},
+ fer:{name:"Ferrous fumarate 210mg tablets",ins:"ONE to be taken THREE times daily",dose:"1.0",stock:"168.0"},
+ lax:{name:"Laxido Orange oral powder sachets sugar free (Galen Ltd)",ins:"Take ONE to TWO sachets THREE times daily",dose:"1.0",stock:"120.0"}
+};
+const CBORDER=["asp","preg","ram","para"];
+const RES=[
+ {id:"cb",n:"Cariotta Bruntje",dob:"24-Jun-1925",room:185,tags:["WIT","CD"]},
+ {id:"ct",n:"Celka Tyas",dob:"31-Jan-1945",room:182,tags:[],sub:"Had a fall"},
+ {id:"ds",n:"Desdemona Scrauniage",dob:"26-Oct-1932",room:181,tags:["WIT","HR","CD"]},
+ {id:"em",n:"Edlin Merrisson",dob:"29-Dec-1936",room:184,tags:["WIT","CD"]}
+];
+const SULIST=[["Cariotta Bruntje","24-Jun-1925",185],["Celka Tyas","31-Jan-1945",182],["Desdemona Scrauniage","26-Oct-1932",181],["Edlin Merrisson","29-Dec-1936",184],["Ericha Woolard","16-Aug-1934",186],["Marge McKinnell","12-Aug-1948",179],["Noelle Riolfo","07-Jun-1930",187],["Foster Lefley","23-Sep-1920",178]];
+const CELLS={
+ cb:[["taken",6],["taken",5],null,["sched",2],["prn",6]],
+ ct:[["skip",3],["skip",1],["skip",1],["skip",1],["prn",4]],
+ ds:[["taken",3],["missed",1],null,["sched",2],["prn",6]],
+ em:[["taken",6],["taken",5],null,["sched",2],["prn",6]]
+};
+const COLS=["Morning","Noon","Evening","Night","PRN"];
+const TASKS=[
+ ["Log in","icons"],["Read the screen","tour1"],["Give a medicine","tapCariotta"],
+ ["Controlled drug + witness","tapPreg"],["Vitals check first","tapRam"],
+ ["PRN pop-ups + follow-up","seePRN"],["Body map (creams & patches)","tapAveeno"],
+ ["Skip with a reason","tapDesd"],["“Take All” round","tapEdlin"],["Photo & log out","toMenuPhoto"]
+];
+const S={active:false,phase:"icons",user:"",home:false,ward:false,task:0,
+ st:{asp:"pend",preg:"pend",ram:"pend",para:"prn",avn:"prn",cod:"pend",fer:"pend",lax:"pend"},
+ sel:null,panel:null,prevPanel:null,wit:false,witness:"",pop:null,
+ doses:{asp:"1.0",preg:"1.0",ram:"1.0",para:"2.0",avn:"1.0",cod:"1.0",fer:"1.0",lax:"1.0"},
+ notes:{},rec:{},vit:{s:"",d:"",p:""},skp:{stock:"",reason:"",note:""},fol:"",flag:false,times:{},
+ bm:{side:"Front",loc:""},suq:"",photo:false,pNotes:"Likes to take Morning Medications with Orange juice",roomNo:"185"};
+const simDone=new Set();
+
+const COACH={
+ icons:{t:"This is the tablet's home screen. Two Camascope icons — tap the purple <b>Camascope&nbsp;2.0</b>."},
+ connect:{t:"“Connecting the dots in care!” — tap <b>Login</b>."},
+ user:{t:"Type <b>your name</b> into the username box, then tap <b>Sign In</b>."},
+ pass:{t:"Now the password page. Type anything at all for practice — then <b>Sign In</b>."},
+ site:{t:"Pick the care home (<b>Hazel House</b>), choose <b>Ground Floor</b>, then tap <b>Continue</b>."},
+ loading:{t:"Loading medical records for your ward…"},
+ tour1:{t:"You're in — the <b>MAR status screen</b>. People down the left, rounds across the top. The purple column is the current round: <b>Evening</b>.",next:1},
+ tour2:{t:"Top corner: <b>Online</b>, <b>Refresh</b>, <b>Today</b> and your name — always check it's <i>you</i>. Try tapping them! Below sit the filter tiles (CD, PRN…) and the <b>Due</b> switch — tappable too.",next:1},
+ tour3:{t:"Each square shows symbols + counts: green ✓ given · orange clock due now · blue calendar later · orange ! skipped · red ▲ missed.",next:1},
+ tapCariotta:{t:"Evening round time! Tap the <b>orange clock in Cariotta's Evening square</b>."},
+ tapAspirin:{t:"Here's Cariotta — photo, <b>allergies</b> and notes on the left. Checked them? Now tap <b>Aspirin</b> at the top of her list."},
+ shAsp:{t:"This is the real form. The <b>Dosage</b> box is yours to edit (1.0 is prescribed), and the <b>Note</b> box is optional — try typing “With orange juice”, like her notes say. Then tap <b>Take</b>."},
+ tapPreg:{t:"Green, signed with your name — lovely! Next: <b>Pregabalin</b>. See the <b>CD</b> tag? Tap it."},
+ shPregNo:{t:"A controlled drug — notice <b>Take is grey</b> and won't work. Check the dosage box, then tap <b>Add Witness</b>."},
+ shWit:{t:"Your colleague picks <b>their</b> name and types <b>their own PIN</b> (any 4+ digits here), then taps <b>Login</b>."},
+ shPregOk:{t:"“Witnessed by …” ✓ — Take is unlocked. Add a note if you like, then tap <b>Take</b>."},
+ tapRam:{t:"Two down! <b>Ramipril</b> (see the little ⌁ vitals mark) needs a blood-pressure check first — tap it."},
+ shVit:{t:"Type the reading into the boxes yourself — try <b>128</b> and <b>76</b> — tap her position, then <b>Continue</b>."},
+ shVitI:{t:"Read the instructions your service wrote — when <b>not</b> to give it and who to call. Then <b>Continue</b> signs the medicine."},
+ seePRN:{t:"All scheduled medicines are green ✓. Now — tap <b>‹</b> as if you were moving to the next person, and watch what the app does…"},
+ popPrn:{t:"See? The app catches you — a PRN is still waiting. Tap <b>Yes Continue</b>."},
+ popRounds:{t:"And a second check: you're navigating away from the round into the PRNs. Tap <b>Yes, Continue</b>."},
+ tapPara:{t:"Here's the PRN section. Tap <b>Paracetamol</b>. (Do peek at ⓘ More Info for its protocol.)"},
+ shInfo:{t:"The <b>PRN protocol</b> — max in 24 hrs, minimum gap, what to do if no effect — plus the history. Tap <b>Back to Medication</b>."},
+ shInfoG:{t:"In the real app this shows BNF warnings and the last 14 days of history. Tap <b>Back to Medication</b>."},
+ shPara:{t:"Set the dosage (2.0 is prescribed) and type the <b>why-note in your own words</b> — e.g. “Cariotta requested for pain”. Take stays locked until it's written."},
+ flag:{t:"See the blue <b>⚑ flag</b> on Paracetamol? That's the follow-up. Tap the flag to record whether it helped."},
+ shFollow:{t:"Type the outcome <b>in your own words</b> — e.g. “Pain settled, comfortable” — then <b>Save</b>."},
+ tapAveeno:{t:"One more for Cariotta: the <b>Aveeno lotion</b> 🧍 — it has a <b>body map</b>. Tap it."},
+ shBody:{t:"Record where it goes. The app remembers last time (see the day chips) and marks the next area <b>Suggested</b> — tap <b>Upper Arm (Right)</b>, then <b>Continue</b>."},
+ backToMar:{t:"Cariotta's whole round — done 🎉 Tap <b>‹</b> at the top-left of her card to go back to the grid."},
+ tapDesd:{t:"Desdemona won't take her Codeine tonight. Tap the clock in <b>her Evening square</b>."},
+ tapCodeine:{t:"Tap <b>Codeine 30mg</b>."},
+ shCod:{t:"She's refused it — so we never tap Take. Tap <b>Skip</b> at the bottom."},
+ shSkip:{t:"Now you fill it in: type <b>1</b> in Reduce stock by (the tablet was popped out), choose <b>Refused</b>, and type what happened in your own words — then <b>Skip</b>."},
+ backToMar2:{t:"Recorded honestly, with a reason ✓ Tap <b>‹</b> to go back to the grid."},
+ tapEdlin:{t:"Now Edlin — 2 medicines due, and we'll do them the fast way. Tap the clock in <b>his Evening square</b>."},
+ takeAllBtn:{t:"This time, tap <b>Take All</b> at the bottom — it walks through every medicine in turn."},
+ shTa1:{t:"Medicine 1 of 2 — check the instructions, prepare the dose (the box is editable), then tap <b>Next</b>."},
+ shTa2:{t:"Medicine 2 of 2 — same again: check, prepare, <b>Next</b>."},
+ shTaList:{t:"The tick list shows everything you prepared. Give them to Edlin, then tap <b>Submit</b> to sign the lot in one go."},
+ backToMar3:{t:"Both signed at once 🎉 Tap <b>‹</b> to go back."},
+ toMenuPhoto:{t:"Two little admin jobs to finish. First, Cariotta's photo needs updating — tap the <b>☰ menu</b>."},
+ drawerSU:{t:"Tap <b>Service Users</b>."},
+ suList:{t:"Everyone in the service — and the <b>search box works</b>, try typing “Car”. Then tap <b>Cariotta Bruntje</b>."},
+ profile:{t:"Her name card — all her details. Tap <b>Edit Profile</b>."},
+ editProf:{t:"You can type here too — the Room No and <b>Notes</b> boxes are editable. Then tap <b>Change Photo</b>."},
+ popCam:{t:"The tablet asks permission to use the camera. Tap <b>While using the app</b>."},
+ snap:{t:"Line her up so it's a <b>true likeness</b>, then tap the shutter ⚪."},
+ editProfSave:{t:"New photo ready 📸 — now tap <b>Save</b>. It updates the app <i>and</i> the portal."},
+ toMenu:{t:"Photo saved ✓ Last job of the shift: <b>log out</b>. Tap the <b>☰ menu</b> in the top-left."},
+ tapLogout:{t:"Tap <b>Logout</b> at the bottom of the menu."}
+};
+function coachKey(){
+ if(S.pop==="prnAsk")return "popPrn";
+ if(S.pop==="rounds")return "popRounds";
+ if(S.pop==="cam")return "popCam";
+ if(S.wit)return "shWit";
+ if(S.panel==="info")return S.sel==="para"?"shInfo":"shInfoG";
+ if(S.panel==="vitform")return "shVit";
+ if(S.panel==="vitinstr")return "shVitI";
+ if(S.panel==="skip")return "shSkip";
+ if(S.panel==="follow")return "shFollow";
+ if(S.panel==="bodymap")return "shBody";
+ if(S.panel==="ta1")return "shTa1";
+ if(S.panel==="ta2")return "shTa2";
+ if(S.panel==="taList")return "shTaList";
+ if(S.panel==="take"){
+   if(S.sel==="asp")return "shAsp";
+   if(S.sel==="preg")return S.witness?"shPregOk":"shPregNo";
+   if(S.sel==="para")return "shPara";
+   if(S.sel==="cod")return "shCod";
+ }
+ if(S.phase==="editProf")return S.photo?"editProfSave":"editProf";
+ return S.phase;
+}
+function simStart(i){
+ S.active=true;S.task=i;S.sel=null;S.panel=null;S.prevPanel=null;S.wit=false;S.witness="";S.pop=null;
+ S.notes={};S.rec={};S.fol="";S.flag=false;S.times={};S.suq="";S.photo=false;
+ S.bm={side:"Front",loc:""};
+ S.pNotes="Likes to take Morning Medications with Orange juice";S.roomNo="185";
+ S.doses={asp:"1.0",preg:"1.0",ram:"1.0",para:"2.0",avn:"1.0",cod:"1.0",fer:"1.0",lax:"1.0"};
+ S.vit={s:"",d:"",p:""};S.skp={stock:"",reason:"",note:""};
+ S.st={asp:"pend",preg:"pend",ram:"pend",para:"prn",avn:"prn",cod:"pend",fer:"pend",lax:"pend"};
+ S.home=i>=1;S.ward=i>=1;
+ if(i>=1&&!S.user)S.user="LauraC";
+ if(i>=3){S.st.asp="taken";S.times.asp=nowT();S.rec.asp={dose:"1.0",note:"With orange juice"};}
+ if(i>=4){S.st.preg="taken";S.times.preg=nowT();S.rec.preg={dose:"1.0",note:"",wit:"Matt Hall"};}
+ if(i>=5){S.st.ram="taken";S.times.ram=nowT();S.rec.ram={dose:"1.0",note:""};S.vit={s:"128",d:"76",p:"SITTING"};}
+ if(i>=6){S.st.para="taken";S.times.para=nowT();S.rec.para={dose:"2.0",note:"Cariotta requested for pain"};S.flag=true;S.fol="Pain settled, comfortable";}
+ if(i>=7){S.st.avn="taken";S.times.avn=nowT();S.rec.avn={dose:"1.0",note:"",loc:"Upper Arm (Right)"};}
+ if(i>=8){S.st.cod="skip";S.skp={stock:"1",reason:"Refused",note:"Wouldn't take as was feeling unwell"};}
+ if(i>=9){S.st.fer="taken";S.st.lax="taken";S.times.fer=nowT();S.times.lax=nowT();S.rec.fer={dose:"1.0",note:""};S.rec.lax={dose:"1.0",note:""};}
+ S.phase=TASKS[i][1];
+ view="sim";render();window.scrollTo(0,0);
+}
+function doneTask(k){simDone.add(k);if(k<TASKS.length-1)S.task=Math.max(S.task,k+1)}
+function plus1h(t){const a=t.split(":");let h=(parseInt(a[0],10)+1)%24;return String(h).padStart(2,"0")+":"+a[1]}
+
+/* ---------- transitions ---------- */
+function tapIcon(w){if(w==="new"){S.phase="connect";render()}else nudge("That's the old app — tap the purple Camascope 2.0")}
+function siLogin(){S.phase="user";render()}
+function siUser(){const v=document.getElementById("si-user").value.trim();if(!v){nudge("Type your name in the box first 💜");return}S.user=v;S.phase="pass";render()}
+function siPass(){const v=document.getElementById("si-pass").value;if(!v){nudge("Type anything as the password");return}S.phase="site";render()}
+function siHome(){S.home=!!document.getElementById("si-home").value;render()}
+function siWard(w){S.ward=(w==="Ground Floor");if(w!=="Ground Floor"){nudge("Ground Floor for this practice 💜")}render()}
+function siGo(){if(!(S.home&&S.ward)){nudge("Choose the home and the floor first");return}S.phase="loading";render();
+ setTimeout(()=>{if(view==="sim"&&S.phase==="loading"){doneTask(0);S.phase="tour1";render()}},1400)}
+function coachNext(){if(S.phase==="tour1")S.phase="tour2";else if(S.phase==="tour2")S.phase="tour3";else if(S.phase==="tour3"){doneTask(1);S.phase="tapCariotta"}render()}
+function tapCell(rid,col){
+ if(S.phase==="tapCariotta"&&rid==="cb"&&col==="Evening"){S.phase="tapAspirin";render();return}
+ if(S.phase==="tapDesd"&&rid==="ds"&&col==="Evening"){S.phase="tapCodeine";render();return}
+ if(S.phase==="tapEdlin"&&rid==="em"&&col==="Evening"){S.phase="takeAllBtn";render();return}
+ nudge();
+}
+function openMed(id){
+ const ok=(S.phase==="tapAspirin"&&id==="asp")||(S.phase==="tapPreg"&&id==="preg")||(S.phase==="tapRam"&&id==="ram")||((S.phase==="seePRN"||S.phase==="tapPara")&&id==="para")||(S.phase==="tapAveeno"&&id==="avn")||(S.phase==="tapCodeine"&&id==="cod");
+ if(!ok){nudge("One at a time — the pink highlight shows tonight's next step 💜");return}
+ S.sel=id;S.panel=(id==="ram")?"vitform":(id==="avn"?"bodymap":"take");
+ if(S.phase==="seePRN")S.phase="tapPara";
+ render();
+}
+function moreInfo(id){S.prevPanel=S.sel?S.panel:null;S.sel=id;S.panel="info";render()}
+function infoBack(){S.panel=S.prevPanel;if(!S.panel)S.sel=null;S.prevPanel=null;render()}
+function pagerTap(){nudge("Finish this entry first — the app moves you on 💜")}
+function micTap(){nudge("The real app types out what you say here — for practice, use the keyboard 💜")}
+function penTap(){nudge("In the real app, the ✎ lets you adjust this")}
+function uiTap(x){
+ const m={online:"Green = connected. If it turns orange 'offline', keep going — the app works offline for 24 hours",
+  refresh:"Refreshed ✓ — this reloads the latest information",
+  today:"The app always opens on today — this calendar lets you look back at previous days",
+  ftile:"Filter tiles show only that kind of medicine — e.g. CD shows just controlled drugs",
+  due:"The Due switch shows only medicines due right now",
+  sort:"These reorder the list — A–Z, room number, and more",
+  search:"Type here to find a person quickly"};
+ toast(m[x]||"Just for show in this practice 💜")}
+function doseInput(v){S.doses[S.sel]=v}
+function taDose(id,v){S.doses[id]=v}
+function noteInput(v){S.notes[S.sel]=v;if(S.sel==="para"){const b=document.getElementById("bt-take");if(b)b.disabled=v.trim().length<5}}
+function takeMed(){
+ const id=S.sel,m=MEDS[id];
+ const d=parseFloat(S.doses[id]);
+ if(!(d>0)){nudge("Type the dosage — e.g. "+m.dose);return}
+ if(id==="preg"&&!S.witness){nudge("A witness first — tap Add Witness 💜");return}
+ if(id==="para"&&(S.notes.para||"").trim().length<5){nudge("The why-note is compulsory — type it in your own words");return}
+ const exp=parseFloat(m.dose);
+ if(d!==exp)toast("Prescribed is "+m.dose+" — you entered "+S.doses[id]+". Always double-check! (Recorded for practice)");
+ const w=S.witness;
+ S.st[id]="taken";S.times[id]=nowT();S.rec[id]={dose:S.doses[id],note:(S.notes[id]||"").trim(),wit:w};
+ S.witness="";S.sel=null;S.panel=null;
+ if(id==="asp"){doneTask(2);S.phase="tapPreg";if(d===exp)toast("✓ Aspirin signed as taken — green, with your name and time")}
+ if(id==="preg"){doneTask(3);S.phase="tapRam";if(d===exp)toast("✓ CD recorded — your name and "+w+"'s both in the history")}
+ if(id==="para"){S.phase="flag";if(d===exp)toast("✓ PRN recorded with your note — now spot the ⚑ flag")}
+ render();
+}
+function witOpen(){S.wit=true;render()}
+function witCancel(){S.wit=false;render()}
+function witLogin(){const n=document.getElementById("wit-name").value,p=document.getElementById("wit-pin").value;
+ if(!n){nudge("Choose the witness's username");return}
+ if(p.length<4){nudge("The PIN needs a few digits — try 123456");return}
+ S.witness=n;S.wit=false;render();toast("👥 Witnessed by "+n+" — Take is now unlocked")}
+function vitPos(p){S.vit.p=p;document.querySelectorAll(".posbtn").forEach(b=>b.classList.toggle("sel",b.dataset.p===p));vitBtn()}
+function vitBtn(){const ok=S.vit.s&&S.vit.d&&S.vit.p;const b=document.getElementById("bt-vit");if(b)b.disabled=!ok}
+function vitGo(){if(!(S.vit.s&&S.vit.d&&S.vit.p)){nudge("Type the reading and tap a position first 💜");return}S.panel="vitinstr";render()}
+function vitInstrGo(){S.st.ram="taken";S.times.ram=nowT();S.rec.ram={dose:S.doses.ram,note:(S.notes.ram||"").trim()};
+ S.sel=null;S.panel=null;doneTask(4);S.phase="seePRN";render();
+ toast("✓ BP "+S.vit.s+"/"+S.vit.d+" recorded and Ramipril signed")}
+function popGo(a){
+ if(S.pop==="prnAsk"){if(a==="later"){nudge("For practice, tap Yes Continue 💜");return}S.pop="rounds";render();return}
+ if(S.pop==="rounds"){if(a==="cancel"){nudge("Tap Yes, Continue — we're going to the PRNs 💜");return}S.pop=null;S.phase="tapPara";render();return}
+ if(S.pop==="cam"){if(a!=="allow"){nudge("The camera is needed for the photo — tap While using the app 💜");return}S.pop=null;S.phase="snap";render();return}
+}
+function flagTap(){if(S.phase==="flag"&&!S.flag){S.sel="para";S.panel="follow";render()}
+ else if(S.flag){toast("Follow-up already done ✓")}else nudge()}
+function folInput(v){S.fol=v;const b=document.getElementById("bt-fol");if(b)b.disabled=v.trim().length<3}
+function followSave(){if(S.fol.trim().length<3){nudge("A quick outcome note in your own words first");return}
+ S.flag=true;S.sel=null;S.panel=null;doneTask(5);S.phase="tapAveeno";render();toast("✓ Follow-up outcome saved")}
+function bmSide(s){if(s!=="Front"){nudge("Front for this one — the arms show on the front view 💜");return}S.bm.side=s;render()}
+function bmPick(loc){S.bm.loc=loc;
+ document.querySelectorAll(".bmopt").forEach(b=>b.classList.toggle("sel",b.dataset.l===loc));
+ const c=document.getElementById("bt-bm");if(c){c.disabled=false;c.classList.add("pulse")}
+ if(loc!=="Upper Arm (Right)")toast("That works too — but 'Suggested' is the app helping you rotate sites")}
+function bmGo(){if(!S.bm.loc){nudge("Tap a location first 💜");return}
+ S.st.avn="taken";S.times.avn=nowT();S.rec.avn={dose:"1.0",note:(S.notes.avn||"").trim(),loc:S.bm.loc};
+ S.sel=null;S.panel=null;doneTask(6);S.phase="backToMar";render();
+ toast("✓ Applied to "+S.bm.loc+" — recorded on the body map")}
+function backBtn(){
+ if(S.phase==="seePRN"&&!S.sel){S.pop="prnAsk";render();return}
+ if(S.sel){nudge("Finish this entry first 💜");return}
+ if(S.phase==="backToMar"){S.phase="tapDesd";render();return}
+ if(S.phase==="backToMar2"){S.phase="tapEdlin";render();return}
+ if(S.phase==="backToMar3"){S.phase="toMenuPhoto";render();return}
+ nudge("Stay on this screen for now — follow the pink highlight 💜")}
+function codSkipOpen(){S.panel="skip";render()}
+function skField(f,v){S.skp[f]=v;const ok=String(S.skp.stock).trim()!==""&&S.skp.reason&&S.skp.note.trim().length>=5;
+ const b=document.getElementById("bt-skip");if(b)b.disabled=!ok}
+function skGo(){const ok=String(S.skp.stock).trim()!==""&&S.skp.reason&&S.skp.note.trim().length>=5;
+ if(!ok){nudge("Stock, reason and your note first 💜");return}
+ S.st.cod="skip";S.sel=null;S.panel=null;doneTask(7);S.phase="backToMar2";render();
+ toast("✓ Skipped with a reason — it turns orange, never red")}
+function taOpen(){if(S.phase!=="takeAllBtn"){nudge();return}S.panel="ta1";render()}
+function taNext(){
+ const id=S.panel==="ta1"?"fer":"lax";
+ if(!(parseFloat(S.doses[id])>0)){nudge("Type the dosage — e.g. 1.0");return}
+ S.panel=(S.panel==="ta1")?"ta2":"taList";render();
+}
+function taSubmit(){
+ S.st.fer="taken";S.st.lax="taken";S.times.fer=nowT();S.times.lax=nowT();
+ S.rec.fer={dose:S.doses.fer,note:""};S.rec.lax={dose:S.doses.lax,note:""};
+ S.panel=null;doneTask(8);S.phase="backToMar3";render();
+ toast("✓ Both signed as taken in one go — that's Take All")}
+function burger(){
+ if(S.phase==="toMenuPhoto"){S.phase="drawerSU";render();return}
+ if(S.phase==="toMenu"){S.phase="tapLogout";render();return}
+ nudge()}
+function drawerTap(x){
+ if(S.phase==="drawerSU"){
+   if(x==="su"){S.phase="suList";render();return}
+   if(x==="logout"){nudge("Photo first — tap Service Users 💜");return}
+   nudge("Tap Service Users 💜");return}
+ if(S.phase==="tapLogout"){
+   if(x==="logout"){doneTask(9);S.phase="end";render();return}
+   nudge("Just Logout now 💜");return}
+ nudge()}
+function suSearch(v){S.suq=v;const g=document.getElementById("sugrid");if(g)g.innerHTML=suCards()}
+function suPick(n){if(n==="Cariotta Bruntje"){S.phase="profile";render()}else nudge("Cariotta's the one whose photo we're updating 💜")}
+function profEdit(){S.phase="editProf";render()}
+function profBack(){nudge("Tap Edit Profile 💜")}
+function changePhoto(){S.pop="cam";render()}
+function snapIt(){S.photo=true;S.phase="editProf";render();toast("📸 Photo taken — check it's a true likeness, then Save")}
+function profSave(){if(!S.photo){nudge("Take the new photo first — tap Change Photo 💜");return}
+ S.phase="toMenu";render();toast("✓ Photo saved — updated on the app and the portal")}
+
+/* ---------- tablet builders ---------- */
+function cico(kind,n){return `<span class="cico">${IC[kind](25)}<span class="n" style="color:${ICCOL[kind]}">${n}</span></span>`}
+function statusBar(){return `<div class="sbar"><span>${nowT()} &nbsp; ${dayStr()}</span><span>${wifiSvg} 61% 🔋</span></div>`}
+function appBar(){
+ const b=(S.phase==="toMenu"||S.phase==="toMenuPhoto")?"pulse":"";
+ return `<div class="abar">
+   <span class="burger ${b}" onclick="burger()" role="button" aria-label="menu">☰</span>
+   <span class="adot"></span><span class="ward">Ground Floor ▾</span>
+   <div class="aright">
+     <span class="aitem" onclick="uiTap('online')" style="cursor:pointer"><span>${wifiSvg}</span>Online</span>
+     <span class="aitem" onclick="uiTap('refresh')" style="cursor:pointer"><span>${refSvg}</span>Refresh</span>
+     <span class="aitem" onclick="uiTap('today')" style="cursor:pointer"><span>${calSvg}</span>Today</span>
+     <span class="aitem"><span class="uav">${esc((S.user||"L")[0].toUpperCase())}</span>${esc(S.user||"LauraC")}</span>
+   </div></div>`}
+function filtersRow(){
+ return `<div class="filters"><span class="ftile sel" onclick="uiTap('ftile')">All</span>${["COVERT","CD","INS","HR","PRN","WRF","NMT","MT","Others"].map(f=>`<span class="ftile" onclick="uiTap('ftile')" style="cursor:pointer">${f}</span>`).join("")}</div>
+ <div class="srow"><span style="cursor:pointer" onclick="uiTap('search')">🔍</span> <span style="letter-spacing:.15em;cursor:pointer" onclick="uiTap('sort')">⇅ ▽</span><span style="margin-left:auto"></span><span style="cursor:pointer" onclick="uiTap('due')">Due <span class="tgl"></span></span></div>`}
+function pendTakenCell(ids){
+ const pend=ids.filter(k=>S.st[k]==="pend").length;
+ const tak=ids.filter(k=>S.st[k]==="taken").length;
+ let h="";if(tak)h+=cico("taken",tak);if(pend)h+=cico("due",pend);if(!h)h=cico("taken",ids.length);
+ return h}
+function dsEveCell(){return S.st.cod==="skip"?cico("skip",1):cico("due",1)}
+function scrMAR(){
+ const rows=RES.map(r=>{
+   let strip;
+   if(r.id==="ct")strip=`<div class="rstrip abs">👤 Absent</div>`;
+   else if(r.id==="ds"&&S.st.cod==="skip")strip=`<div class="rstrip skp">⚠ Skipped</div>`;
+   else strip=`<div class="rstrip sch">🕐 Scheduled (16:00 - 20:00)</div>`;
+   const ini=r.n.split(" ").map(x=>x[0]).join("");
+   const pc=`<div class="pcell"><span class="pava">${ini}</span>
+     <span class="pmeta"><span class="pname">${r.n}</span><br><span class="psub">${r.sub?r.sub+"<br>":""}${r.dob} | Ground Floor</span>
+     ${r.tags.length?`<span class="ptags">${r.tags.map(t=>`<span class="badge">${t}</span>`).join("")}</span>`:""}</span>
+     <span class="proom">${r.room}</span></div>`;
+   const cells=COLS.map((c,i)=>{
+     let inner, extra="", tap="";
+     if(r.id==="cb"&&c==="Evening"){inner=pendTakenCell(["asp","preg","ram"]);
+       if(S.phase==="tapCariotta"){extra="pulse";tap=`onclick="tapCell('cb','Evening')" role="button" tabindex="0"`}}
+     else if(r.id==="ds"&&c==="Evening"){inner=dsEveCell();
+       if(S.phase==="tapDesd"){extra="pulse";tap=`onclick="tapCell('ds','Evening')" role="button" tabindex="0"`}}
+     else if(r.id==="em"&&c==="Evening"){inner=pendTakenCell(["fer","lax"]);
+       if(S.phase==="tapEdlin"){extra="pulse";tap=`onclick="tapCell('em','Evening')" role="button" tabindex="0"`}}
+     else{const cd=CELLS[r.id][i];inner=cd?cico(cd[0],cd[1]):""}
+     return `<div class="cell ${c==="Evening"?"cur":""} ${tap?"tap":""} ${extra}" ${tap}>${inner}</div>`;
+   }).join("");
+   return strip+pc+cells;
+ }).join("");
+ const dOpen=(S.phase==="tapLogout"||S.phase==="drawerSU");
+ const drawer=dOpen?`
+  <div class="drawer"><div class="dpanel">
+    <div class="dname">${esc(S.user||"LauraC")}</div>
+    <div class="dsub">Secondary Login · Reset PIN</div>
+    <div class="ditem" onclick="drawerTap('mar')">📋 MAR Status</div>
+    <div class="ditem ${S.phase==="drawerSU"?"pulse":""}" onclick="drawerTap('su')">👥 Service Users</div>
+    <div class="ditem" onclick="drawerTap('cw')">↔ Change Ward</div>
+    <div class="ditem ${S.phase==="tapLogout"?"pulse":""}" onclick="drawerTap('logout')">⏻ Logout</div>
+    <div class="dfoot">Build version: 0106</div>
+  </div><div style="flex:1" onclick="nudge('${S.phase==="drawerSU"?"Tap Service Users 💜":"Tap Logout in the menu 💜"}')"></div></div>`:"";
+ return statusBar()+appBar()+filtersRow()+
+  `<div class="gridwrap"><div class="marg">
+    <div class="gh first"></div>${COLS.map(c=>`<div class="gh ${c==="Evening"?"cur":""}">${c}</div>`).join("")}
+    ${rows}
+  </div></div>`+drawer;
+}
+/* ----- person: list mode cards ----- */
+function medCard(id){
+ const m=MEDS[id],st=S.st[id];
+ let strip,stripCls;
+ if(st==="pend"){strip="🕐 ⊕ Pending (16:00 - 20:00)";stripCls="pend"}
+ else if(st==="taken"){strip="✓ ⊕ Taken";stripCls="take"}
+ else if(st==="skip"){strip="⚠ ⊕ Skipped - "+esc(S.skp.reason||"Refused");stripCls="skp"}
+ else{strip="⊕ PRN";stripCls="prn"}
+ const isTarget=(S.phase==="tapAspirin"&&id==="asp")||(S.phase==="tapPreg"&&id==="preg")||(S.phase==="tapRam"&&id==="ram")||((S.phase==="seePRN"||S.phase==="tapPara")&&id==="para")||(S.phase==="tapAveeno"&&id==="avn")||(S.phase==="tapCodeine"&&id==="cod");
+ const clickable=isTarget?`onclick="openMed('${id}')" role="button" tabindex="0"`:"";
+ const rec=S.rec[id]||{};
+ let lines="";
+ if(st==="taken"){
+   const shown=(rec.dose||m.dose);
+   lines=`<div class="mline"><span class="lchip red">Last Taken: just now</span> To be taken: ${m.dose} <span class="okgreen">✓ Taken: ${esc(shown)}</span> ${S.times[id]||nowT()}</div>
+          <div class="mline">👤 ${esc(S.user||"LauraC")}${id==="preg"&&S.rec.preg&&S.rec.preg.wit?` &nbsp;👥 ${esc(S.rec.preg.wit)}`:""}${id==="ram"&&S.vit.s?` &nbsp;📈 BP ${esc(S.vit.s)}/${esc(S.vit.d)} (${esc((S.vit.p||"").toLowerCase())})`:""}${id==="avn"&&rec.loc?` &nbsp;📍 ${esc(rec.loc)}`:""}</div>`;
+   if(rec.note)lines+=`<div class="mline">🗒 ${esc(rec.note)}</div>`;
+   if(id==="para")lines+=`<div class="mline"><span class="fchip ${S.flag?"doneflag":(S.phase==="flag"?"pulse":"")}" onclick="flagTap()">⚑ ${S.flag?"Follow-up done ✓":"Follow-up "+plus1h(S.times.para||nowT())}</span>${S.flag&&S.fol?` 🗒 ${esc(S.fol)}`:""}</div>`;
+ }else if(st==="skip"){
+   lines=`<div class="mline">${esc(S.skp.reason||"Refused")} · Reduced: ${esc(S.skp.stock||"1")}.0 · ${nowT()} · 👤 ${esc(S.user||"LauraC")}</div><div class="mline">🗒 ${esc(S.skp.note)}</div>`;
+ }else{
+   lines=`<div class="mline">To be taken: ${m.dose} <span class="lchip">Last Taken: 6 days ago</span>
+     ${m.prn&&id==="para"?`<span class="fchip" style="cursor:default">⚑ Has Follow-up</span>`:""}
+     <span class="moreinfo" onclick="event.stopPropagation();moreInfo('${id}')">ⓘ More Info</span></div>`;
+   if(id==="para")lines+=`<div class="mline" style="color:#8a2be2;font-weight:700">Max Dosage: 4 per day | Min Gap: 04:00 Hours</div>`;
+ }
+ const marks=(id==="ram"&&st==="pend")?` <span title="vitals required" style="color:#8a2be2">⌁</span>`:(m.body?` <span title="body map" style="color:#8a2be2">🧍</span>`:"");
+ return `<div class="mc ${isTarget?"pulse":""}" ${clickable}>
+   <div class="mstrip ${stripCls}"><span>${strip}</span><span class="stk">${m.stock} ⊞ 0.0</span></div>
+   <div class="mbody"><div class="mn">${m.name}${marks}</div><div class="mi">${m.ins}</div>
+   ${m.tags?`<div class="mline">${m.tags.map(t=>`<span class="badge">${t}</span>`).join("")}</div>`:""}
+   ${lines}</div></div>`;
+}
+/* ----- inline detail ----- */
+function detHead(id){
+ const m=MEDS[id],st=S.st[id];
+ let strip="🕐 ⊕ Pending (16:00 - 20:00)",cls="pend";
+ if(st==="prn"||m.prn){strip="⊕ PRN";cls="prn"}
+ return `<div class="dethead">
+  <div class="mstrip ${cls}" style="border-radius:8px"><span>${strip}</span><span class="stk">${m.stock} ⊞ 0.0</span></div>
+  <div class="mline" style="justify-content:space-between;margin-top:.3rem"><span class="mn">${m.name}</span>
+    <span class="moreinfo" onclick="moreInfo('${id}')">ⓘ More Info</span></div>
+  <div class="mi">${m.ins}</div>
+  ${m.tags?`<div class="mline">${m.tags.map(t=>`<span class="badge">${t}</span>`).join("")}</div>`:""}
+  ${id==="para"?`<div class="mline" style="color:#8a2be2;font-weight:700">Max Dosage: 4 per day | Min Gap: 04:00 Hours</div>`:""}
+  <div class="mline">To be taken: ${m.dose} <span class="lchip">Last Taken: 6 days ago</span>${id==="para"?` <span class="fchip" style="cursor:default">⚑ Has Follow-up</span>`:""}</div>
+ </div>`;
+}
+function noteField(id,mandatory){
+ const val=esc(S.notes[id]||"");
+ const lab=mandatory?`Note * <span class="req">(required — why do they need it?)</span>`:"Note";
+ return `<div class="fld noterow"><label>${lab}</label>
+  <textarea rows="2" placeholder="Enter notes" oninput="noteInput(this.value)">${val}</textarea>
+  <span class="mic" onclick="micTap()">🎤</span></div>`;
+}
+function dtRow(){return `<div class="fld"><label>Date and Time</label>
+ <div class="dtline">🗓 ${todayStr()} &nbsp; 🕐 ${nowT()} <span class="pen" onclick="penTap()">✎</span></div></div>`}
+function witnessBlock(id){
+ if(S.witness)return `<div class="witchip">⚙ Witnessed by ${esc(S.witness)} <span style="color:var(--ink-soft)">⏻</span></div>`;
+ const mandatory=(id==="preg");
+ return `<button class="abtn outline ${mandatory?"pulse":""}" style="flex:0;padding:.35rem .9rem;font-size:.78rem" onclick="witOpen()">Add Witness</button>
+ ${mandatory?`<div class="hint" style="color:var(--blue);font-weight:800">(Mandatory witness)</div>`:""}`;
+}
+function panelTake(id){
+ const m=MEDS[id];
+ const isCd=(id==="preg"),isPrn=(id==="para"),isCod=(id==="cod");
+ const takeOk=isCd?!!S.witness:(isPrn?((S.notes.para||"").trim().length>=5):true);
+ const takePulse=(takeOk&&!isCod)?"pulse":"";
+ const skipBtn=isCod
+   ?`<button class="abtn outline sk pulse" onclick="codSkipOpen()">Skip</button>`
+   :`<button class="abtn outline sk" onclick="nudge('This one is being given — finish the form, then Take 💜')">Skip</button>`;
+ const takeBtn=isCod
+   ?`<button class="abtn solid tk" onclick="nudge('She has refused it — never sign Taken for a medicine not given. Tap Skip 💜')">Take</button>`
+   :`<button class="abtn solid tk ${takePulse}" id="bt-take" ${takeOk?"":"disabled"} onclick="takeMed()">Take</button>`;
+ return detHead(id)+`
+  <div class="formtitle">Take Medication</div><div class="mand">(All fields marked with * are mandatory)</div>
+  <div class="fld"><label>Dosage *</label>
+   <input inputmode="decimal" value="${esc(S.doses[id])}" oninput="doseInput(this.value)">
+   <div class="hint">(${m.ins})</div></div>
+  <div class="fld"><label>Route of Administration</label><div class="dtline">Oral</div></div>
+  ${dtRow()}
+  ${noteField(id,isPrn)}
+  ${isPrn?`<div class="hint" style="margin:.2rem 0 .1rem"><b>Follow-up</b> — Mandatory follow-up is scheduled for 🗓 ${todayStr()} 🕐 ${plus1h(nowT())}<br>Follow up Instructions: Check in 1 hr to make sure admin was effective</div>`:""}
+  ${witnessBlock(id)}
+  <div class="brow">
+   <span class="ig" onclick="nudge('Ignore is for entries that should not be on the round — not tonight 💜')">Ignore</span>
+   ${skipBtn}${takeBtn}
+  </div>`;
+}
+function panelVitForm(){
+ return detHead("ram")+`
+  <div class="vban">ⓘ You must Record the vital for this medication</div>
+  <div style="font-weight:800;font-size:.85rem">📈 Record Blood Pressure</div>
+  <div style="display:flex;gap:.5rem">
+   <div class="fld" style="flex:1"><label>Systolic</label><input inputmode="numeric" placeholder="mmHG" value="${esc(S.vit.s)}" oninput="S.vit.s=this.value;vitBtn()"></div>
+   <div class="fld" style="flex:1"><label>Diastolic</label><input inputmode="numeric" placeholder="mmHG" value="${esc(S.vit.d)}" oninput="S.vit.d=this.value;vitBtn()"></div>
+  </div>
+  <div class="fld"><label>Position</label><div class="posrow">
+   ${["SITTING","STANDING","LYING"].map(p=>`<button class="posbtn ${S.vit.p===p?"sel":""}" data-p="${p}" onclick="vitPos('${p}')">${p}</button>`).join("")}
+  </div></div>
+  <div class="fld noterow"><label>Notes</label><textarea rows="2" placeholder="Enter notes" oninput="noteInput(this.value)">${esc(S.notes.ram||"")}</textarea><span class="mic" onclick="micTap()">🎤</span></div>
+  <div class="brow">
+   <button class="abtn outline sk" onclick="nudge('The check is needed before giving 💜')">Cancel</button>
+   <button class="abtn solid tk ${S.vit.s&&S.vit.d&&S.vit.p?"pulse":""}" id="bt-vit" ${S.vit.s&&S.vit.d&&S.vit.p?"":"disabled"} onclick="vitGo()">Continue</button>
+  </div>`;
+}
+function panelVitInstr(){
+ return detHead("ram")+`
+  <div style="font-weight:800;font-size:.88rem;margin:.3rem 0 .2rem">Vital Instructions</div>
+  <div class="note" style="margin:.3rem 0;font-size:.78rem"><b>Blood Pressure Management Protocol (example set up by your service)</b>
+   <b style="margin-top:.3rem">Urgent Hypertensive Crisis Thresholds — Systolic &gt; 180 or Diastolic &gt; 110:</b>
+   • Do <u>not</u> administer.<br>• Contact emergency services immediately (999).<br>• Stay with the service user, monitor symptoms (chest pain, confusion, weakness), and provide reassurance.<br>
+   <b style="margin-top:.3rem">Stage 2 Hypertension — Systolic 140–180 or Diastolic 90–110:</b><br>• Follow your service's instructions and inform the GP.
+  </div>
+  <div class="brow">
+   <button class="abtn outline sk" onclick="nudge('Have a read first, then Continue 💜')">Cancel</button>
+   <button class="abtn solid tk pulse" onclick="vitInstrGo()">Continue</button>
+  </div>`;
+}
+function panelSkip(){
+ const ok=String(S.skp.stock).trim()!==""&&S.skp.reason&&S.skp.note.trim().length>=5;
+ return detHead("cod")+`
+  <div class="formtitle">Skip Medication</div><div class="mand">(All fields marked with * are mandatory)</div>
+  <div class="fld"><label>Reduce stock by *</label>
+   <input type="number" min="0" placeholder="Enter dosage" value="${esc(S.skp.stock)}" oninput="skField('stock',this.value)">
+   <div class="hint">(${MEDS.cod.ins})</div></div>
+  <div class="fld"><label>Reason for Skip *</label>
+   <select onchange="skField('reason',this.value)"><option value="">Select…</option>
+   ${["Refused","Hospitalised","Nausea","On Leave","Destroyed","Sleeping","Pulse Abnormal","Offered - Not Required","Medication Not Available","Strength Not Required","Other"].map(r=>`<option ${S.skp.reason===r?"selected":""}>${r}</option>`).join("")}</select></div>
+  ${dtRow()}
+  <div class="fld noterow"><label>Note * <span class="req">(required — what actually happened?)</span></label>
+   <textarea rows="2" placeholder="Enter notes" oninput="skField('note',this.value)">${esc(S.skp.note)}</textarea><span class="mic" onclick="micTap()">🎤</span></div>
+  <div class="brow">
+   <button class="abtn outline sk" onclick="nudge('She refused — finish the Skip 💜')">Take</button>
+   <button class="abtn solid tk ${ok?"pulse":""}" id="bt-skip" ${ok?"":"disabled"} onclick="skGo()">Skip</button>
+  </div>`;
+}
+function panelInfo(id){
+ const m=MEDS[id];
+ let body;
+ if(id==="para"){
+  body=`<div class="note" style="font-size:.78rem;margin:.4rem 0"><b>Warnings</b>Do not take more than 2 at any one time, or more than 8 in 24 hours. Contains Paracetamol — do not take anything else containing Paracetamol. Talk to a doctor at once if you take too much, even if you feel well.
+  <b style="margin-top:.35rem">PRN Protocol</b>Max Admin Warnings: Do not take more than 4 times in 24 hours<br>Max Admins In 24Hrs: <b>4</b><br>Min Interval Warnings: Minimum of 4 hours between doses<br>Min Interval Between Admins: <b>04:00</b><br>Action If No Effect: <b>if no relief contact GP</b></div>`;
+ }else{
+  body=`<div class="note" style="font-size:.78rem;margin:.4rem 0"><b>Warnings</b>In the real app, medication warnings from the BNF appear here.</div>
+  <div style="font-weight:800;font-size:.78rem;margin:.3rem 0 .1rem">History (last 14 days)</div>
+  ${[1,2,3].map(i=>{const d=new Date(Date.now()-i*864e5),mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `<div class="histrow"><b>✓</b> ${String(d.getDate()).padStart(2,"0")}-${mo[d.getMonth()]}-${d.getFullYear()}, 08:00 &nbsp;<b>Taken: 1.0</b><br>👤 Manager Manager &nbsp; ⚙ Witness Witness</div>`}).join("")}`;
+ }
+ return `<div class="dethead"><div class="mn">${m.name}</div>
+  <div class="mline" style="gap:1rem;margin-top:.2rem"><span style="font-weight:800;border-bottom:2.5px solid var(--purple-dark);padding-bottom:.1rem">Medication Info</span><span style="color:var(--ink-soft);font-weight:700">History</span></div></div>
+  ${body}
+  <div class="brow" style="justify-content:center"><button class="abtn solid" style="flex:0;padding:.45rem 1.1rem" onclick="infoBack()">Back to Medication</button></div>`;
+}
+function panelFollow(){
+ return detHead("para")+`
+  <div class="formtitle">Follow-up</div>
+  <div class="mand">Mandatory follow-up is scheduled for 🗓 ${todayStr()} 🕐 ${plus1h(S.times.para||nowT())}</div>
+  <div class="hint" style="text-align:center;margin-bottom:.3rem">Follow up Instructions: Check in 1 hr to make sure admin was effective</div>
+  <div class="fld noterow"><label>Follow-up outcome * <span class="req">(required)</span></label>
+   <textarea rows="2" placeholder="e.g. Pain settled, Cariotta comfortable" oninput="folInput(this.value)">${esc(S.fol)}</textarea><span class="mic" onclick="micTap()">🎤</span></div>
+  <div class="brow">
+   <button class="abtn solid tk ${S.fol.trim().length>=3?"pulse":""}" id="bt-fol" ${S.fol.trim().length>=3?"":"disabled"} onclick="followSave()">Save</button>
+  </div>`;
+}
+function panelBody(){
+ return detHead("avn")+`
+  <div class="formtitle">Take Medication — Body Map</div>
+  <div class="fbtabs"><span class="fbtab ${S.bm.side==="Front"?"sel":""}" onclick="bmSide('Front')">Front [2]</span><span class="fbtab" onclick="bmSide('Back')">Back [2]</span></div>
+  <div class="bmwrap">
+   <div class="bmfig">${silSvg}
+     <span class="bmchip" style="left:-4px;top:34px;background:#2f6fed">7 days ago<br>Suggested</span>
+     <span class="bmchip" style="right:-4px;top:34px;background:#dc2626">6 days ago</span>
+   </div>
+   <div class="bmopts">
+     <div class="bmopt ${S.bm.loc==="Upper Arm (Right)"?"sel":""}" data-l="Upper Arm (Right)" onclick="bmPick('Upper Arm (Right)')">◯ Upper Arm (Right) <span class="sugg">Suggested</span></div>
+     <div class="bmopt ${S.bm.loc==="Upper Arm (Left)"?"sel":""}" data-l="Upper Arm (Left)" onclick="bmPick('Upper Arm (Left)')">◯ Upper Arm (Left)</div>
+   </div>
+  </div>
+  <div class="fld noterow"><label>Notes</label><textarea rows="2" placeholder="Enter notes" oninput="noteInput(this.value)">${esc(S.notes.avn||"")}</textarea><span class="mic" onclick="micTap()">🎤</span></div>
+  <div class="brow">
+   <button class="abtn outline sk" onclick="nudge('Pick the spot first 💜')">Cancel</button>
+   <button class="abtn solid tk" id="bt-bm" ${S.bm.loc?"":"disabled"} onclick="bmGo()">Continue</button>
+  </div>`;
+}
+function panelTaStep(id,n){
+ const m=MEDS[id];
+ return `<div class="pager"><span onclick="pagerTap()">‹</span> ✓ ${n} of 2 <span onclick="pagerTap()">›</span></div>`+detHead(id)+`
+  <div class="formtitle">Take All — prepare this dose</div>
+  <div class="fld"><label>Dosage *</label>
+   <input inputmode="decimal" value="${esc(S.doses[id])}" oninput="taDose('${id}',this.value)">
+   <div class="hint">(${m.ins})</div></div>
+  ${dtRow()}
+  <div class="brow">
+   <button class="abtn outline sk" onclick="nudge('We are mid-round — carry on 💜')">Cancel</button>
+   <button class="abtn solid tk pulse" onclick="taNext()">Next</button>
+  </div>`;
+}
+function panelTaList(){
+ const row=id=>`<div class="histrow"><b>✓</b> ${MEDS[id].name}<br>Dosage taken: ${esc(S.doses[id])} <span class="pen" onclick="penTap()">✎</span></div>`;
+ return `<div class="pager">✓ 2 of 2 — all prepared</div>
+  <div class="formtitle">Ready to sign</div>
+  <div class="mand">Give the medicines to Edlin, then Submit marks them all as taken</div>
+  ${row("fer")}${row("lax")}
+  <div class="brow">
+   <button class="abtn outline sk" onclick="nudge('So close — tap Submit 💜')">Cancel</button>
+   <button class="abtn solid tk pulse" onclick="taSubmit()">Submit</button>
+  </div>`;
+}
+function detailPanel(rid){
+ let pager="";
+ if(rid==="cb"&&["take","vitform","vitinstr"].includes(S.panel)){
+  const n=CBORDER.indexOf(S.sel)+1;
+  pager=`<div class="pager"><span onclick="pagerTap()">‹</span> ${n} of ${CBORDER.length} <span onclick="pagerTap()">›</span></div>`;
+ }
+ let body="";
+ if(S.panel==="take")body=panelTake(S.sel);
+ else if(S.panel==="vitform")body=panelVitForm();
+ else if(S.panel==="vitinstr")body=panelVitInstr();
+ else if(S.panel==="skip")body=panelSkip();
+ else if(S.panel==="info")body=panelInfo(S.sel);
+ else if(S.panel==="follow")body=panelFollow();
+ else if(S.panel==="bodymap")body=panelBody();
+ else if(S.panel==="ta1")body=panelTaStep("fer",1);
+ else if(S.panel==="ta2")body=panelTaStep("lax",2);
+ else if(S.panel==="taList")body=panelTaList();
+ return `<div class="detwrap">${pager}${body}</div>`;
+}
+function listPanel(rid){
+ let list="";
+ if(rid==="cb"){
+  const order=["asp","preg","ram"].sort((a,b)=>(S.st[a]==="pend"?0:1)-(S.st[b]==="pend"?0:1));
+  list=order.map(id=>medCard(id)).join("")+`<div class="prndiv"><span>PRN</span></div>`+medCard("para")+medCard("avn");
+ }else if(rid==="ds"){
+  list=medCard("cod")+`<div class="prndiv"><span>PRN</span></div>
+  <div class="mc" onclick="nudge('Just the Codeine tonight 💜')"><div class="mstrip prn"><span>⊕ PRN</span><span class="stk">8.0 ⊞ 0.0</span></div>
+  <div class="mbody"><div class="mn">Buprenorphine 15micrograms/hour transdermal patches 🧍</div><div class="mi">Apply weekly to arm, swap arm each week</div>
+  <div class="mline"><span class="badge">WIT</span><span class="badge">CD</span> To be taken: 0.0 <span class="lchip">Last Taken: 6 days ago</span></div></div></div>`;
+ }else{
+  const order=["fer","lax"].sort((a,b)=>(S.st[a]==="pend"?0:1)-(S.st[b]==="pend"?0:1));
+  list=order.map(id=>medCard(id)).join("");
+ }
+ const taPulse=(rid==="em"&&S.phase==="takeAllBtn")?"pulse":"";
+ return `<div class="timechip"><b>16:00 - 20:00 🕐</b></div>
+  <div class="medlist">${list}</div>
+  <div class="pbot">
+   <button class="abtn outline" onclick="nudge('Skip All is for a whole round that cannot be given 💜')">Skip All</button>
+   <button class="abtn solid ${taPulse}" onclick="${rid==="em"?"taOpen()":"nudge('Take All walks through each medicine in turn — with Cariotta we go one by one so you learn each type 💜')"}">Take All</button>
+  </div>`;
+}
+function popHtml(){
+ if(!S.pop)return "";
+ if(S.pop==="prnAsk")return `<div class="popc"><div class="popcard">
+  <h5>PRN Medication</h5><p>A PRN medication has been added for the service user. Would you like to administer it now?</p>
+  <div class="poprow"><button class="linkbtn" onclick="popGo('later')">Later</button>
+  <button class="abtn solid pulse" style="flex:0;padding:.4rem 1rem" onclick="popGo('yes')">Yes Continue</button></div></div></div>`;
+ if(S.pop==="rounds")return `<div class="popc"><div class="popcard">
+  <h5>Rounds Alert</h5><p>You are trying to move away from the current round. Are you sure you want to navigate to another round?</p>
+  <div class="poprow"><button class="linkbtn" onclick="popGo('cancel')">Cancel</button>
+  <button class="abtn solid pulse" style="flex:0;padding:.4rem 1rem" onclick="popGo('yes')">Yes, Continue</button></div></div></div>`;
+ if(S.pop==="cam")return `<div class="popc"><div class="popcard">
+  <h5>📷 Allow Camascope UAT to take pictures and record video?</h5>
+  <div class="poprow" style="flex-direction:column;align-items:stretch">
+   <button class="abtn solid pulse" onclick="popGo('allow')">While using the app</button>
+   <button class="linkbtn" onclick="popGo('once')">Only this time</button>
+   <button class="linkbtn" onclick="popGo('deny')">Don't allow</button></div></div></div>`;
+ return "";
+}
+function scrPerson(rid){
+ const r=RES.find(x=>x.id===rid);
+ const backPulse=(!S.sel&&(S.phase==="seePRN"||S.phase==="backToMar"||S.phase==="backToMar2"||S.phase==="backToMar3"))?"pulse":"";
+ const right=S.sel||["ta1","ta2","taList"].includes(S.panel)?detailPanel(rid):listPanel(rid);
+ const wm=S.wit?`<div class="wmodal"><div class="wcard">
+   <h4>Add Witness</h4><div class="sub">Witness Authorisation is needed for this medication administration</div>
+   <div class="fld"><label>Select witness</label>
+    <select id="wit-name"><option value="">Select …</option><option>Matt Hall</option><option>Laura Casey</option><option>Nurse_14</option></select></div>
+   <div class="fld"><label>Enter PIN 🔒</label><input id="wit-pin" type="password" inputmode="numeric" maxlength="12" placeholder="Enter PIN (try 123456)"></div>
+   <div class="brow">
+    <button class="abtn outline sk" onclick="witCancel()">Cancel</button>
+    <button class="abtn solid tk pulse" onclick="witLogin()">👁 Login</button>
+   </div></div></div>`:"";
+ const notes=(rid==="cb")?S.pNotes:"Likes to take Morning Medications with Orange juice";
+ return statusBar()+appBar()+`
+ <div class="pv">
+  <div class="pv-left">
+   <span class="pv-back ${backPulse}" onclick="backBtn()" role="button" aria-label="back">‹</span>
+   <div class="pv-name">${r.n} <span style="float:right">${r.room}</span></div>
+   <div class="psub">${r.dob} | Ground Floor</div>
+   <div class="bigava">${S.photo&&rid==="cb"?`<div style="text-align:center">${silSvg}<div class="newbadge">📸 New</div></div>`:silSvg}</div>
+   <div class="ph">🧷 Allergies</div>
+   <div>Penicillin, Nuts, Simvastatin</div>
+   <div class="ph">🗒 Notes</div>
+   <div>${esc(notes)}</div>
+  </div>
+  <div class="pv-right">
+   <div class="ptabs"><span>Morning</span><span>Noon</span><span class="cur">Evening •</span><span>Night</span><span>PRN</span></div>
+   ${right}
+  </div>
+ </div>${wm}${popHtml()}`;
+}
+/* ----- service users / profile / photo ----- */
+function suCards(){
+ const q=S.suq.trim().toLowerCase();
+ return SULIST.filter(s=>!q||s[0].toLowerCase().includes(q)).map(s=>{
+  const ini=s[0].split(" ").map(x=>x[0]).join("");
+  const p=(s[0]==="Cariotta Bruntje")?"pulse":"";
+  return `<div class="sucard ${p}" onclick="suPick('${s[0].replace(/'/g,"\\'")}')"><span class="pava">${ini}</span>
+   <span><span class="nm">${s[0]}</span><br><span class="dt">${s[1]} | Ground Floor</span></span>
+   <span class="rm">${s[2]}</span></div>`}).join("")||`<div style="grid-column:1/-1;color:var(--ink-soft);font-size:.8rem;padding:.6rem">No one matches — clear the search 💜</div>`;
+}
+function scrSU(){
+ return statusBar()+appBar()+`
+ <div class="sulist">
+  <div style="font-weight:800;font-size:.85rem;margin-bottom:.35rem">Service Users (${SULIST.length}) <span style="float:right;font-weight:700;color:var(--ink-soft);font-size:.72rem">⇅ Sort By</span></div>
+  <div class="fld" style="margin:.2rem 0 .5rem"><input placeholder="🔍 Search" value="${esc(S.suq)}" oninput="suSearch(this.value)"></div>
+  <div class="sugrid" id="sugrid">${suCards()}</div>
+ </div>`;
+}
+function scrProfile(){
+ return statusBar()+appBar()+`
+ <div class="detwrap">
+  <div class="dethead"><span class="pv-back" onclick="profBack()">‹</span> <b style="font-size:.9rem">Cariotta Bruntje</b> <span class="activechip">Active</span> ✎
+   <div class="psub">24-Jun-1925, 100 Yrs, Ground Floor (${esc(S.roomNo)})</div>
+   <div class="mline" style="gap:1.2rem;margin-top:.3rem"><span style="font-weight:800;border-bottom:2.5px solid var(--purple-dark);padding-bottom:.1rem">Details</span><span style="color:var(--ink-soft);font-weight:700" onclick="nudge('Medical holds conditions, GP and allergies 💜')">Medical</span></div></div>
+  <div class="profgrid">
+   <div><b>Status</b>Active</div><div><b>Unit</b>Hazel House</div>
+   <div><b>NHS Number</b>1851850007</div><div><b>Room No</b>${esc(S.roomNo)}</div>
+   <div><b>First Name</b>Cariotta</div><div><b>DNAR Signed</b>☐ DNAR Signed</div>
+   <div><b>Last Name</b>Bruntje</div><div><b>DoLS Authorised</b>☐ DoLS Authorised</div>
+  </div>
+  <div class="brow" style="justify-content:center"><button class="abtn solid pulse" style="flex:0;padding:.45rem 1.3rem" onclick="profEdit()">Edit Profile</button></div>
+ </div>`;
+}
+function scrEditProf(){
+ return statusBar()+appBar()+`
+ <div class="detwrap">
+  <div class="dethead"><b style="font-size:.9rem">Cariotta Bruntje</b> <span class="activechip">Active</span>
+   <div class="psub">24-Jun-1925, 100 Yrs, Ground Floor (${esc(S.roomNo)})</div></div>
+  <div style="display:flex;gap:.7rem;align-items:center;margin:.3rem 0 .1rem">
+   <div class="bigava" style="width:70px;height:70px;margin:0">${silSvg}</div>
+   <div>
+    <button class="abtn outline ${S.photo?"":"pulse"}" style="padding:.35rem .8rem;font-size:.76rem" onclick="changePhoto()">✎ Change Photo</button>
+    ${S.photo?`<div class="newbadge" style="margin-top:.3rem">📸 New photo ready</div>`:""}
+   </div>
+  </div>
+  <div class="fld"><label>Room No</label><input value="${esc(S.roomNo)}" oninput="S.roomNo=this.value"></div>
+  <div class="fld noterow"><label>Notes</label><textarea rows="2" oninput="S.pNotes=this.value">${esc(S.pNotes)}</textarea><span class="mic" onclick="micTap()">🎤</span></div>
+  <div class="brow">
+   <button class="abtn outline sk" onclick="nudge('Nearly there — photo, then Save 💜')">Cancel</button>
+   <button class="abtn solid tk ${S.photo?"pulse":""}" onclick="profSave()">Save</button>
+  </div>
+ </div>${popHtml()}`;
+}
+function scrSnap(){
+ return statusBar()+`<div class="snapview">
+  <div style="color:#cfc8e8;font-weight:800;font-size:.85rem">📷 Camera — Cariotta Bruntje</div>
+  <div class="frame">${silSvg}</div>
+  <button class="shutter pulse" onclick="snapIt()" aria-label="take photo"></button>
+  <div style="color:#8f86b8;font-size:.7rem">Make sure it's a true likeness of the person</div>
+ </div>`;
+}
+function scrEnd(){
+ return statusBar()+`<div class="endwrap">
+  <div style="font-size:2.4rem">🎉</div><h3>Round complete — and logged out!</h3>
+  <p style="color:var(--ink-soft)">Look at everything you just did, ${esc(S.user||"superstar")} — typed by your own hand:</p>
+  <ul>
+   <li>✓ Logged in and picked your ward</li>
+   <li>✓ Gave Aspirin — dose ${esc((S.rec.asp&&S.rec.asp.dose)||"1.0")}${S.rec.asp&&S.rec.asp.note?`, note “${esc(S.rec.asp.note)}”`:""}</li>
+   <li>✓ Gave a controlled drug, witnessed by ${esc((S.rec.preg&&S.rec.preg.wit)||"Matt Hall")}</li>
+   <li>✓ Recorded BP ${esc(S.vit.s||"128")}/${esc(S.vit.d||"76")} before Ramipril</li>
+   <li>✓ Handled the PRN pop-ups, gave it with your note${S.rec.para&&S.rec.para.note?` — “${esc(S.rec.para.note)}”`:""} — and did the follow-up</li>
+   <li>✓ Body-mapped the lotion to ${esc((S.rec.avn&&S.rec.avn.loc)||"Upper Arm (Right)")}</li>
+   <li>✓ Skipped a refused medicine — “${esc(S.skp.note||"Wouldn't take as was feeling unwell")}”</li>
+   <li>✓ Ran a “Take All” round for Edlin and Submitted it</li>
+   <li>✓ Updated Cariotta's photo via Service Users</li>
+   <li>✓ Logged out properly</li>
+  </ul>
+  <p style="color:var(--ink-soft)">That is <b>every job in the 31-page guide</b>, exactly as the real app works. 💜</p>
+  <div class="navrow" style="justify-content:center">
+   <button class="btn btn-ghost" onclick="simStart(0)">↺ Do the whole round again</button>
+   <button class="btn btn-primary" onclick="goHome()">Back to the guide</button>
+  </div></div>`;
+}
+function tabletScreen(){
+ const p=S.phase;
+ if(p==="icons")return statusBar()+`<div class="homeicons">
+   <div class="hicon pulse" onclick="tapIcon('new')" role="button" tabindex="0"><div class="sq"><span class="ring"></span></div>Camascope 2.0</div>
+   <div class="hicon old" onclick="tapIcon('old')" role="button" tabindex="0"><div class="sq"><span class="ring"></span></div>Classic Camascope</div></div>`;
+ if(p==="connect")return statusBar()+`<div class="lg">
+   <div class="biglogo"><span class="adot"></span>Cama<b>scope</b></div>
+   <h3>Connecting<br>the<br><span class="pk">dots in care!</span></h3>
+   <button class="pill pulse" onclick="siLogin()">Login</button>
+   <div class="cap">You will be redirected to a login page<br>and then returned to the app</div></div>`;
+ if(p==="user")return statusBar()+`<div class="lg">
+   <div class="biglogo"><span class="adot"></span>Cama<b>scope</b></div>
+   <div style="font-weight:800">LOGIN</div>
+   <div class="lfld"><label>Enter Username</label><input id="si-user" placeholder="👤 User name" value="${esc(S.user)}"></div>
+   <button class="pill pulse" onclick="siUser()">Sign In</button>
+   <div class="cap">New User or Forgot Username?<br>Contact your administrator</div></div>`;
+ if(p==="pass")return statusBar()+`<div class="lg">
+   <div class="biglogo"><span class="adot"></span>Cama<b>scope</b></div>
+   <div style="font-weight:800">LOGIN</div>
+   <div class="lfld"><label>Enter Password</label><input id="si-pass" type="password" placeholder="🔒 Password"><div style="text-align:right;font-size:.7rem;color:var(--brand2);font-weight:700">Forgot Password?</div></div>
+   <button class="pill pulse" onclick="siPass()">Sign In</button>
+   <div class="cap">New User or Forgot Username?<br>Contact your administrator</div></div>`;
+ if(p==="site")return statusBar()+`<div class="lg">
+   <div class="biglogo"><span class="adot"></span>Cama<b>scope</b></div>
+   <div class="cap">${wifiSvg} Network - <b style="color:var(--blue)">Online</b> &nbsp; 🔋 Battery - <b style="color:var(--blue)">100% Full</b></div>
+   <div class="lfld"><label>Select Carehome</label>
+    <select id="si-home" onchange="siHome()"><option value="">Select Care Home</option><option ${S.home?"selected":""}>Hazel House</option></select></div>
+   ${S.home?`<div class="radios"><b style="font-size:.78rem">Select Wards/Units</b>
+    <label><input type="radio" name="wd" onclick="siWard('All Wards')"> All Wards</label>
+    <label><input type="radio" name="wd" onclick="siWard('Ground Floor')" ${S.ward?"checked":""}> Ground Floor</label>
+    <label><input type="radio" name="wd" onclick="siWard('First Floor')"> First Floor</label></div>
+   <button class="pill ${S.ward?"pulse":""}" ${S.home&&S.ward?"":"disabled"} onclick="siGo()">Continue</button>`:""}</div>`;
+ if(p==="loading")return statusBar()+`<div class="lg">
+   <div class="biglogo"><span class="adot"></span>Cama<b>scope</b></div>
+   <div style="font-weight:800">Connecting the dots in <span style="color:var(--brand1)">care</span></div>
+   <div class="cap">Simplifying Medication Management</div>
+   <div class="spin"></div>
+   <div class="cap">Loading medical records for the<br>selected ward. Please wait a moment.</div></div>`;
+ if(p==="end")return scrEnd();
+ if(p==="suList")return scrSU();
+ if(p==="profile")return scrProfile();
+ if(p==="editProf")return scrEditProf();
+ if(p==="snap")return scrSnap();
+ if(["tapAspirin","tapPreg","tapRam","seePRN","tapPara","flag","tapAveeno","backToMar"].includes(p))return scrPerson("cb");
+ if(["tapCodeine","backToMar2"].includes(p))return scrPerson("ds");
+ if(["takeAllBtn","backToMar3"].includes(p))return scrPerson("em");
+ return scrMAR();
+}
+function renderSim(){
+ const ck=coachKey(),c=COACH[ck]||{t:""};
+ app.innerHTML=`
+  <div class="crumb no-print"><button class="back" onclick="goHome()">‹ Back to the guide</button>
+   <span class="where">Practice tablet · Task ${Math.min(S.task+1,TASKS.length)} of ${TASKS.length} — ${TASKS[Math.min(S.task,TASKS.length-1)][0]}</span></div>
+  ${S.phase!=="end"?`<div class="coach"><span class="cico">👩‍🏫</span><span class="ctxt">${c.t}</span>${c.next?`<button class="cbtn" onclick="coachNext()">Next ›</button>`:""}</div>`:""}
+  <div class="tabfr"><div class="tab">${tabletScreen()}</div></div>
+  <p class="no-print" style="margin-top:.7rem;font-size:.9rem;color:var(--ink-soft)">Jump to a task:
+   ${TASKS.map((t,i)=>`<button class="tchip ${simDone.has(i)?"done":""}" onclick="simStart(${i})">${simDone.has(i)?"✓ ":""}${i+1}. ${t[0]}</button>`).join(" ")}</p>`;
+}
+
+/* ================= practice PORTAL (office website) ================= */
+const PTASKS=[
+ ["Log in to the Portal","purl"],["Dashboard tour","ptour1"],["Set your witness PIN","pinMenu"],
+ ["Check in a delivery","ciMenu"],["Add a medicine (Adhoc)","adhocBtn"],["Edit & stop a schedule","schMenu"],
+ ["Reorder + stock","ordMenu"],["Print a MAR chart","repMenu"],["Sign out","outMenu"]
+];
+const P={phase:"purl",pop:null,user:"",task:0,
+ pin1:"",pin2:"",pinDone:false,
+ dq:{para:"100",aml:"100"},ciTab:"bg",paraDone:false,amlDone:false,
+ set:{lt:true,am:true,sc:true,prn:false,cd:false,hr:false,pain:false,qr:false},fui:"",
+ ad:{q:"",pick:"",qty:"",di:"",rdose:"1",saved:false,done:false},
+ se:{d12:"1",note:"",saved:false},
+ sp:{note:"",dest:"Destroyed",done:false},
+ or:{n1:false,n2:false,q1:"28",q2:"28",saved:false},
+ sk2:{s:"",t:"",note:"",saved:false},
+ rp:{person:false}};
+const pDone=new Set();
+function pDoneTask(k){pDone.add(k);if(k<PTASKS.length-1)P.task=Math.max(P.task,k+1)}
+
+const PCOACH={
+ purl:{t:"This is the office computer. The Portal lives in the web browser — click the <b>address bar</b> to visit <b>emar.vcaresystems.co.uk</b>."},
+ pchoose:{t:"“Choose an account to login to Care Portal” — click <b>Another User</b>. (Never use someone else's saved account.)"},
+ puser:{t:"Same username and password as the tablet app. Type <b>your name</b>, then <b>Sign In</b>."},
+ ppass:{t:"And the password — anything for practice — then <b>Sign In</b>."},
+ ptour1:{t:"The <b>eMAR Dashboard</b> — live totals straight from the rounds: <b>Missed</b> (not signed for), <b>Delayed</b>, <b>Skipped</b> (with a reason), <b>PRN Admins</b>, <b>Follow Ups</b>. Tap any tile to hear what it means.",next:1},
+ ptour2:{t:"The panels below: <b>Pending Check-In</b> (pharmacy items waiting), <b>Medication Alerts</b> (same-ingredient clashes), <b>Missed Actions</b> (last 48 hrs), <b>Service User Status</b> (absences), <b>Stock Alerts</b>. All tappable.",next:1},
+ ptour3:{t:"Along the top: <b>Dashboard · Medication · Reports · Admin</b>, the search box, and your <b>initials</b> — the account menu. That's the whole Portal.",next:1},
+ pinMenu:{t:"First job: set your <b>witness PIN</b> for the tablet. Click your <b>initials</b>, top-right."},
+ pinDrop:{t:"Choose <b>Manage account → Secondary Pin</b>."},
+ pinForm:{t:"Type a PIN of <b>6–12 digits</b>, type it again to confirm, then click <b>Setup</b>. This PIN is only ever used for witnessing — everything else still needs your password."},
+ ciMenu:{t:"A pharmacy delivery has arrived. Open <b>Medication ▾</b> along the blue bar."},
+ ciDrop:{t:"Choose <b>Check-Ins</b> (under Orders)."},
+ ciList:{t:"People with a number have items waiting to check in. Click <b>Cariotta Bruntje (2)</b>."},
+ ciPerson:{t:"Two dispensed medicines. The <b>Dispensed Qty</b> boxes are editable — check them against the boxes in your hand. Then click <b>Verify</b> on the Paracetamol."},
+ ciReview:{t:"The review screen — click through the tabs: <b>Brand/Generic · Medication · Schedule · Settings · Warnings</b>. In Settings, the tickboxes are yours (Long Term keeps it on next month's cycle). Then click <b>Check-in</b>."},
+ ciClashBtn:{t:"Amlodipine shows a <b>Schedule Clash</b> — the pharmacy has sent a new time. Click <b>Resolve</b>."},
+ ciClash:{t:"Two schedules side by side: <b>Current Cycle (06:00)</b> and <b>New Cycle (08:00)</b>. The GP wants the new time — click <b>Change to New Schedule</b>."},
+ adhocBtn:{t:"Now a medicine that arrived <i>without</i> pharmacy data — an interim. Click <b>Add New Medicine</b>, top-right."},
+ adhocSearch:{t:"Free-type the name from the box label — try typing <b>oxy</b> — then pick <b>Oxyact 20mg tablets</b> from the list."},
+ adhocQty:{t:"Type the quantity from the label into <b>Dispensed Qty</b> (try 28), then press <b>Setup</b>."},
+ adhocSched:{t:"The <b>Schedule Pattern</b>: type the <b>Dosage Instructions</b> exactly as the label says, set the round's <b>Dosage</b>, then <b>Save</b>."},
+ adhocReview:{t:"Back on the check-in page with your new entry — click <b>Check-in</b> to finish."},
+ schMenu:{t:"A GP has changed a dose — schedules can <b>only</b> be edited here on the Portal. Open <b>Medication ▾</b>."},
+ schDrop:{t:"Choose <b>Schedule</b> (under Medication Management)."},
+ schList:{t:"Cariotta's medicines and how each is set up. Click <b>Laxido Orange sachets</b>."},
+ schView:{t:"The calendar shows every round this cycle. Click <b>✎ Edit Schedule</b>."},
+ schEdit:{t:"Change the 12:00 round's <b>Dosage</b> to <b>2</b>, and — this is the rule — type a <b>Note</b> explaining why. Save stays locked until the note is in."},
+ stopPick:{t:"Saved, with your note stored ✓ Next: the GP has <b>stopped Amlodipine</b>. Click it in the list."},
+ stopView:{t:"Click the red <b>⊘ Stop</b> button."},
+ stopForm:{t:"Set the stop date, type a <b>Note</b> (why), and choose where the stock goes — <b>Returned</b> to pharmacy or <b>Destroyed</b>. Then <b>Amend Stock and Stop</b>."},
+ ordMenu:{t:"Monthly order time. Open <b>Medication ▾</b>."},
+ ordDrop:{t:"Choose <b>Repeat Requests</b> (under Orders)."},
+ ordList:{t:"Click <b>New</b> next to the items needed — do both — check the quantities, then press <b>Save</b>."},
+ stkMenu:{t:"One more stock job. Open <b>Medication ▾</b>."},
+ stkDrop:{t:"Choose <b>Stock</b>."},
+ stkView:{t:"All the stock activity for the Laxido. Click <b>Amend</b>."},
+ stkAmend:{t:"Move 28 sachets from Shelf to Trolley: under <b>Other</b>, type <b>-28</b> in S and <b>28</b> in T — and the <b>Note</b> is mandatory, as always. Then <b>Save</b>."},
+ repMenu:{t:"Inspection-ready in two clicks. Open <b>Reports ▾</b>."},
+ repDrop:{t:"Choose <b>MAR Chart</b>."},
+ repForm:{t:"Pick <b>Cariotta</b> on the left, check the from-date, then click <b>Show Report</b>."},
+ repView:{t:"There's her printable MAR chart — every round, every signature. Click <b>Print</b>."},
+ outMenu:{t:"All done — click your <b>initials</b>, top-right."},
+ outDrop:{t:"Click <b>Sign out</b>. The Portal is ready for the next person."},
+ popCiOk:{t:"Checked in ✓ — it moves to the Checked-in tab. Click <b>Ok</b>."},
+ popCiOk2:{t:"Amlodipine is in, on the new 08:00 schedule ✓ Click <b>Ok</b>."},
+ popAdOk:{t:"Your Oxyact entry is live on the eMAR ✓ Click <b>Ok</b>."},
+ popOrdOk:{t:"Green tick = order placed ✓ (Failures show in red with the reason.) Note the <b>Next Cycle Order Report (PDF)</b> for a printable list. Click <b>Close</b>."}
+};
+function pCoachKey(){
+ if(P.pop==="ciOk")return "popCiOk";
+ if(P.pop==="ciOk2")return "popCiOk2";
+ if(P.pop==="adOk")return "popAdOk";
+ if(P.pop==="ordOk")return card("Order Request",`An order request is currently being sent.<br><br>${P.or.n1?"✅ Laxido Orange sachets — Save ✓<br>":""}${P.or.n2?"✅ Paracetamol 500mg tablets — Save ✓<br>":""}<span style='color:#b91c1c'>(If an order fails, it shows here in red with the reason — e.g. a request already pending in the past 30 days.)</span>`,`<button class="abtn solid pulse" style="flex:0;padding:.4rem 1.2rem" onclick="orClose()">Close</button>`);
+ return P.phase;
+}
+function pSimStart(i){
+ P.phase=PTASKS[i][1];P.pop=null;P.task=i;P.user=S.user||"LauraC";
+ P.pin1="";P.pin2="";P.pinDone=i>=3;
+ P.dq={para:"100",aml:"100"};P.ciTab="bg";P.paraDone=i>=4;P.amlDone=i>=4;
+ P.set={lt:true,am:true,sc:true,prn:false,cd:false,hr:false,pain:false,qr:false};P.fui="";
+ P.ad={q:"",pick:"",qty:"",di:"",rdose:"1",saved:false,done:i>=5};
+ P.se={d12:"1",note:"",saved:i>=6};
+ P.sp={note:"",dest:"Destroyed",done:i>=6};
+ P.or={n1:false,n2:false,q1:"28",q2:"28",saved:i>=7};
+ P.sk2={s:"",t:"",note:"",saved:i>=7};
+ P.rp={person:false};
+ view="psim";render();window.scrollTo(0,0);
+}
+/* ---- transitions ---- */
+function pUrlGo(){if(P.phase==="purl"){P.phase="pchoose";render()}else toast("emar.vcaresystems.co.uk — you're already here 💜")}
+function pChoose(w){if(w==="other"){P.phase="puser";render()}else nudge("That's someone else's saved account — always use your own. Click Another User 💜")}
+function pUser(){const v=document.getElementById("p-user").value.trim();if(!v){nudge("Type your name first 💜");return}P.user=v;P.phase="ppass";render()}
+function pPass(){const v=document.getElementById("p-pass").value;if(!v){nudge("Type anything as the password");return}pDoneTask(0);P.phase="ptour1";render()}
+function pCoachNext(){if(P.phase==="ptour1")P.phase="ptour2";else if(P.phase==="ptour2")P.phase="ptour3";else if(P.phase==="ptour3"){pDoneTask(1);P.phase="pinMenu"}render()}
+function tileTap(k){const m={su:"Service Users: how many are active, and how many marked absent (hospital or leave)",
+ miss:"Missed: medication with no signature at all — these need chasing today",
+ del:"Delayed: given, but later than the round time",
+ skip:"Skipped: not given, with a reason recorded (e.g. refused)",
+ prn:"PRN Admins: when-required medicines given",
+ fu:"Follow Ups: PRN follow-ups completed",
+ pci:"Pending Check-In: medicines the pharmacy has sent, waiting to be checked in",
+ alert:"Medication Alerts: two medicines with the same ingredient (potential clash), plus stopped/stopping items",
+ ma:"Missed Actions: missing signatures and missed follow-ups from the last 48 hours",
+ sus:"Service User Status: who is marked absent or no longer in the home",
+ stk:"Stock Alerts: negative figures, low stock, and stopped medicines still holding stock"};
+ toast(m[k]||"Live data from the rounds 💜")}
+function pMenu(which){
+ if(which==="med"){
+  if(P.phase==="ciMenu"){P.phase="ciDrop";render();return}
+  if(P.phase==="schMenu"){P.phase="schDrop";render();return}
+  if(P.phase==="ordMenu"){P.phase="ordDrop";render();return}
+  if(P.phase==="stkMenu"){P.phase="stkDrop";render();return}
+  nudge();return}
+ if(which==="rep"){if(P.phase==="repMenu"){P.phase="repDrop";render();return}nudge();return}
+ if(which==="ini"){
+  if(P.phase==="pinMenu"){P.phase="pinDrop";render();return}
+  if(P.phase==="outMenu"){P.phase="outDrop";render();return}
+  nudge();return}
+ if(which==="dash"){toast("Dashboard: eMAR Dashboard, Account Dashboard (multi-home), Orders, eMAR Status, Vitals");return}
+ if(which==="adm"){toast("Admin: Service Users (add new, absences), Staff Users, Unit Configuration — usually a manager job");return}
+ nudge()}
+function pDropPick(x){
+ if(P.phase==="ciDrop"&&x==="checkins"){P.phase="ciList";render();return}
+ if(P.phase==="schDrop"&&x==="schedule"){P.phase="schList";render();return}
+ if(P.phase==="ordDrop"&&x==="repeat"){P.phase="ordList";render();return}
+ if(P.phase==="stkDrop"&&x==="stock"){P.phase="stkView";render();return}
+ if(P.phase==="repDrop"&&x==="marchart"){P.phase="repForm";render();return}
+ if(P.phase==="pinDrop"&&x==="pin"){P.phase="pinForm";render();return}
+ if(P.phase==="outDrop"&&x==="signout"){pDoneTask(8);P.phase="pend";render();return}
+ if(x==="password"){toast("Password: change it here — needs your current one; 8+ characters with upper, lower, number and a special character");return}
+ nudge("Follow the pink highlight 💜")}
+function pinIn(n,v){if(n===1)P.pin1=v;else P.pin2=v;
+ const ok=/^\d{6,12}$/.test(P.pin1)&&P.pin1===P.pin2;
+ const b=document.getElementById("bt-pin");if(b)b.disabled=!ok}
+function pinSetup(){if(!/^\d{6,12}$/.test(P.pin1)){nudge("6 to 12 digits, numbers only 💜");return}
+ if(P.pin1!==P.pin2){nudge("Both boxes must match");return}
+ P.pinDone=true;pDoneTask(2);P.phase="ciMenu";render();toast("✓ Witness PIN set — you can now witness on the tablet")}
+function ciPick(n){if(n==="cb"){P.phase="ciPerson";render()}else nudge("Cariotta has the delivery today 💜")}
+function dqIn(k,v){P.dq[k]=v}
+function ciVerify(){P.ciTab="bg";P.phase="ciReview";render()}
+function ciRejIgn(x){toast(x==="rej"?"Reject sends it back for the pharmacy to correct and resend":"Ignore removes it for good — the pharmacy cannot resend. Only if it is truly not needed")}
+function ciTabPick(t){P.ciTab=t;render()}
+function setTgl(k){P.set[k]=!P.set[k];render();
+ const m={lt:"Long Term: carries over to every monthly cycle",am:"Administration Managed: makes it appear on the tablet to sign",sc:"Stock Counted: counts down after each dose — untick for creams and drops",prn:"PRN: only given when needed — unlocks the PRN protocol",cd:"Controlled Drug: needs a witness at administration",hr:"High Risk: flags it and asks for a witness (not quite a CD)",pain:"Pain Level on eMAR: adds a 1–10 pain scale at administration",qr:"QR Code Enabled: asks for the label to be scanned"};
+ toast(m[k]||"")}
+function ciCheckin(){P.pop="ciOk";render()}
+function ciPopOk(){P.pop=null;P.paraDone=true;P.phase="ciClashBtn";render()}
+function ciResolve(){P.phase="ciClash";render()}
+function ciKeep(){nudge("That keeps 06:00 — the GP wants the new time. Click Change to New Schedule 💜")}
+function ciNew(){P.pop="ciOk2";render()}
+function ciPopOk2(){P.pop=null;P.amlDone=true;pDoneTask(3);P.phase="adhocBtn";render()}
+function adOpen(){if(P.phase!=="adhocBtn"){nudge();return}P.phase="adhocSearch";render()}
+function adIn(v){P.ad.q=v;const d=document.getElementById("addrop");if(!d)return;
+ const q=v.trim().toLowerCase();
+ if(q.length<3){d.innerHTML="";return}
+ const opts=["Oxycodone 20mg tablets","Oxyact 20mg tablets (Kent Pharma (UK) Ltd)","Oxytetracycline 250mg tablets"].filter(o=>o.toLowerCase().includes(q));
+ d.innerHTML=opts.map(o=>`<div class="pditem ${o.startsWith("Oxyact")?"pulse":""}" onclick="adPick('${o.replace(/'/g,"\\'")}')">${o}</div>`).join("")||`<div class="pditem" style="color:var(--ink-soft)">No matches</div>`}
+function adPick(o){if(!o.startsWith("Oxyact")){nudge("Pick Oxyact — that's what's on the label 💜");return}P.ad.pick=o;P.phase="adhocQty";render()}
+function adQtyIn(v){P.ad.qty=v;const b=document.getElementById("bt-adset");if(b)b.disabled=!(parseFloat(v)>0)}
+function adSetup(){if(!(parseFloat(P.ad.qty)>0)){nudge("Type the quantity from the label — try 28");return}P.phase="adhocSched";render()}
+function adDiIn(v){P.ad.di=v;const b=document.getElementById("bt-adsave");if(b)b.disabled=v.trim().length<8}
+function adRdIn(v){P.ad.rdose=v}
+function adSave(){if(P.ad.di.trim().length<8){nudge("Type the dosage instructions from the label first 💜");return}
+ if(!(parseFloat(P.ad.rdose)>0)){nudge("Set the round's dosage — e.g. 1");return}
+ P.ad.saved=true;P.phase="adhocReview";render();toast("✓ Schedule saved — back to check in")}
+function adCheckin(){P.pop="adOk";render()}
+function adPopOk(){P.pop=null;P.ad.done=true;pDoneTask(4);P.phase="schMenu";render()}
+function schPick(m){
+ if(P.phase==="schList"&&m==="lax"){P.phase="schView";render();return}
+ if(P.phase==="stopPick"&&m==="aml"){P.phase="stopView";render();return}
+ nudge("Follow the pink highlight 💜")}
+function schEditOpen(){if(P.phase==="schView"){P.phase="schEdit";render()}else nudge()}
+function schStopOpen(){if(P.phase==="stopView"){P.phase="stopForm";render()}else nudge("Edit the Laxido first 💜")}
+function seD12(v){P.se.d12=v}
+function seNoteIn(v){P.se.note=v;const b=document.getElementById("bt-se");if(b)b.disabled=v.trim().length<5}
+function seSave(){if(P.se.note.trim().length<5){nudge("The note explaining why is mandatory 💜");return}
+ P.se.saved=true;P.phase="stopPick";render();toast("✓ Schedule updated — your note is stored with the change")}
+function spNoteIn(v){P.sp.note=v;const b=document.getElementById("bt-sp");if(b)b.disabled=v.trim().length<5}
+function spDest(d){P.sp.dest=d;document.querySelectorAll(".destopt").forEach(x=>x.classList.toggle("sel",x.dataset.d===d))}
+function spSave(){if(P.sp.note.trim().length<5){nudge("A note first — why is it stopping? 💜");return}
+ P.sp.done=true;pDoneTask(5);P.phase="ordMenu";render();
+ toast("✓ Amlodipine stopped — stock marked as "+P.sp.dest.toLowerCase())}
+function orNew(n){if(n===1)P.or.n1=!P.or.n1;else P.or.n2=!P.or.n2;render()}
+function orQ(n,v){if(n===1)P.or.q1=v;else P.or.q2=v}
+function orSave(){const c=(P.or.n1?1:0)+(P.or.n2?1:0);if(!c){nudge("Click New on the items needed first 💜");return}P.pop="ordOk";render()}
+function orClose(){P.pop=null;P.or.saved=true;P.phase="stkMenu";render()}
+function orPdf(){toast("🖨 Generates the printable order list — cross-reference it when the delivery arrives, and some GPs accept it instead of paper slips")}
+function stkAmendOpen(){if(P.phase==="stkView"){P.phase="stkAmend";render()}else nudge()}
+function stkAudit(){toast("Audit: record a stock check against the item — with a mandatory note. Bulk Audit does the whole list")}
+function sk2In(f,v){P.sk2[f]=v;
+ const ok=(String(P.sk2.s).trim()!==""||String(P.sk2.t).trim()!=="")&&P.sk2.note.trim().length>=5;
+ const b=document.getElementById("bt-sk2");if(b)b.disabled=!ok}
+function sk2Other(){toast("Returned = back to pharmacy · Lost · Destroyed — each records where stock went. 'Other' covers moves like shelf → trolley")}
+function sk2Save(){const ok=(String(P.sk2.s).trim()!==""||String(P.sk2.t).trim()!=="")&&P.sk2.note.trim().length>=5;
+ if(!ok){nudge("The S/T figures and the note first 💜");return}
+ const s=parseFloat(P.sk2.s||"0"),t=parseFloat(P.sk2.t||"0");
+ if(s+t!==0)toast("Tip: moving stock should balance — e.g. -28 off the Shelf, +28 onto the Trolley");
+ P.sk2.saved=true;pDoneTask(6);P.phase="repMenu";render();
+ toast("✓ Stock updated — every change like this shows on the Stock Report")}
+function rpPick(n){if(n==="cb"){P.rp.person=true;render()}else nudge("Cariotta's chart today 💜")}
+function rpShow(){if(!P.rp.person){nudge("Pick Cariotta on the left first 💜");return}P.phase="repView";render()}
+function rpPrint(){pDoneTask(7);P.phase="outMenu";render();toast("🖨 Sent to the printer — in real life the print window opens here")}
+/* ---- builders ---- */
+function pIni(){return esc((P.user||"L")[0].toUpperCase())}
+function pNav(){
+ const medP=["ciMenu","schMenu","ordMenu","stkMenu"].includes(P.phase)?"pulse":"";
+ const repP=(P.phase==="repMenu")?"pulse":"";
+ const iniP=(P.phase==="pinMenu"||P.phase==="outMenu")?"pulse":"";
+ return `<div class="pnav">
+  <span class="adot" style="box-shadow:inset 0 0 0 4px #10162c"></span><b>Cama<span style="color:#f0abfc">scope</span></b>
+  <span class="pnavi" onclick="pMenu('dash')">▦ Dashboard ▾</span>
+  <span class="pnavi ${medP}" onclick="pMenu('med')">⊞ Medication ▾</span>
+  <span class="pnavi ${repP}" onclick="pMenu('rep')">▤ Reports ▾</span>
+  <span class="pnavi" onclick="pMenu('adm')">👥 Admin ▾</span>
+  <span style="margin-left:auto"></span>
+  <input class="pnsearch" placeholder="Search" onclick="toast('Search jumps straight to a person or medicine')">
+  <span class="pnavi" onclick="toast('Messages from Camascope')">✉</span>
+  <span class="pini ${iniP}" onclick="pMenu('ini')">${pIni()}${P.user&&P.user.length>1?esc(P.user[1].toUpperCase()):""}</span>
+ </div>`}
+function pDropMed(){
+ const t=(x)=>({ciDrop:"checkins",schDrop:"schedule",ordDrop:"repeat",stkDrop:"stock"})[P.phase]===x?"pulse":"";
+ return `<div class="pdrop" style="left:170px">
+  <div class="pdhead">⊞ Medication Management</div>
+  <div class="pditem ${t("schedule")}" onclick="pDropPick('schedule')">Schedule</div>
+  <div class="pditem" onclick="pDropPick('details')">Details</div>
+  <div class="pditem ${t("stock")}" onclick="pDropPick('stock')">Stock</div>
+  <div class="pditem" onclick="pDropPick('history')">History</div>
+  <div class="pditem" onclick="pDropPick('prnp')">Prn Protocols</div>
+  <div class="pdhead">🛒 Orders</div>
+  <div class="pditem ${t("checkins")}" onclick="pDropPick('checkins')">Check-Ins</div>
+  <div class="pditem ${t("repeat")}" onclick="pDropPick('repeat')">Repeat Requests</div>
+ </div>`}
+function pDropRep(){
+ return `<div class="pdrop" style="left:300px">
+  ${["MAR Report","PRN Report","Stock Report","Vital Report","Orders Report","Stock Balance Report"].map(r=>`<div class="pditem" onclick="toast('${r}: filters by unit, person, staff and dates — then Generate, PDF or CSV')">${r}</div>`).join("")}
+  <div class="pditem pulse" onclick="pDropPick('marchart')">MAR Chart</div>
+  <div class="pditem" onclick="toast('Service Users Chart: printable person summary with all active medicines')">Service Users Chart</div>
+  <div class="pditem" onclick="toast('Body Map Chart: where topicals were applied')">Body Map Chart</div>
+ </div>`}
+function pDropIni(){
+ const pinP=(P.phase==="pinDrop")?"pulse":"";
+ const outP=(P.phase==="outDrop")?"pulse":"";
+ return `<div class="pdrop" style="right:8px;left:auto">
+  <div class="pditem ${outP}" onclick="pDropPick('signout')">⏻ ${P.phase==="outDrop"?"Sign out":"Logout"}</div>
+  <div class="pdhead">⚙ Manage account</div>
+  <div class="pditem" onclick="pDropPick('profile')">My Profile</div>
+  <div class="pditem" onclick="pDropPick('password')">Password</div>
+  <div class="pditem ${pinP}" onclick="pDropPick('pin')">Secondary Pin <span style="color:#dc2626;font-size:.62rem">${P.pinDone?"":"(Pending Setup)"}</span></div>
+ </div>`}
+function pScrLogin(){
+ if(P.phase==="pchoose")return `<div class="lg">
+  <div class="biglogo"><span class="adot"></span>Cama<b>scope</b> <span style="font-weight:600;color:var(--ink-soft)">CarePortal</span></div>
+  <h3 style="font-size:1.3rem">Connecting the<br><span class="pk">dots in care</span></h3>
+  <div class="cap">Choose an account to login to Care Portal</div>
+  <div style="display:flex;gap:.8rem;margin-top:.4rem">
+   <button class="pill" style="background:#efe9f7;color:var(--purple-dark)" onclick="pChoose('mm')">MA<br><span style="font-size:.62rem">Manager Manager</span></button>
+   <button class="pill pulse" onclick="pChoose('other')">👤<br><span style="font-size:.62rem">Another User</span></button>
+  </div></div>`;
+ if(P.phase==="puser")return `<div class="lg">
+  <div class="biglogo"><span class="adot"></span>Cama<b>scope</b></div>
+  <div style="font-weight:800">LOGIN</div>
+  <div class="lfld"><label>Enter Username</label><input id="p-user" placeholder="👤 User name" value="${esc(P.user)}"></div>
+  <button class="pill pulse" onclick="pUser()">Sign In</button>
+  <div class="cap">New User or Forgot Username?<br>Contact your administrator</div></div>`;
+ return `<div class="lg">
+  <div class="biglogo"><span class="adot"></span>Cama<b>scope</b></div>
+  <div style="font-weight:800">LOGIN</div>
+  <div class="lfld"><label>Enter Password</label><input id="p-pass" type="password" placeholder="🔒 Password"><div style="text-align:right;font-size:.7rem;color:var(--brand2);font-weight:700">Forgot Password?</div></div>
+  <button class="pill pulse" onclick="pPass()">Sign In</button></div>`}
+function pScrDash(){
+ const tiles=[["su","Service Users","20","2 Absent","#7a4bd0"],["miss","Missed","4","162 Yesterday","#d0342c"],
+  ["del","Delayed","0","0 Yesterday","#e07b12"],["skip","Skipped","6","6 Yesterday","#e07b12"],
+  ["prn","PRN Admins","0","0 Yesterday","#7a4bd0"],["fu","Follow Ups","0","0 Yesterday","#7a4bd0"]];
+ const bars=[62,70,64,68,74,66,71,69,73,65,72,80,60,52].map(h=>`<i style="height:${h}%"></i>`).join("");
+ const pan=(k,tt,rows)=>`<div class="dpan" onclick="tileTap('${k}')"><b>${tt}</b>${rows}</div>`;
+ return pNav()+`
+ <div class="pwrap">
+  <div class="dtiles">${tiles.map(t=>`<div class="dtile" style="--tc:${t[4]}" onclick="tileTap('${t[0]}')"><span class="tl">${t[1]}</span><span class="tn">${t[2]}</span><span class="ts">${t[3]}</span></div>`).join("")}</div>
+  <div class="dbars">${bars}</div>
+  <div class="dpanels">
+   ${pan("pci","Pending Check-In <span class='pchip orange'>2</span>","<div class='drow'>Cariotta Bruntje <span>2</span></div><div class='drow'>Sheridan Cherry <span>6</span></div><div class='drow'>Orel Dunbobbin <span>7</span></div>")}
+   ${pan("alert","Medication Alerts <span class='pchip orange'>1</span>","<div class='drow'>Marchall Campaigne <span>1 clash</span></div>")}
+   ${pan("ma","Missed Actions [48 Hrs] <span class='pchip red'>357</span>","<div class='drow'>Ronny Smullen <span>24</span></div><div class='drow'>Jakie Whebell <span>24</span></div>")}
+   ${pan("sus","Service User Status <span class='pchip'>1</span>","<div class='drow'>Sheridan Cherry <span>Hospitalised</span></div>")}
+   ${pan("stk","Stock Alerts <span class='pchip orange'>20</span>","<div class='drow'>Ronny Smullen <span>2 stopped</span></div><div class='drow'>Mersey Maraga <span>low</span></div>")}
+  </div>
+ </div>`+(["ciDrop","schDrop","ordDrop","stkDrop"].includes(P.phase)?pDropMed():"")
+  +(P.phase==="repDrop"?pDropRep():"")
+  +((P.phase==="pinDrop"||P.phase==="outDrop")?pDropIni():"")}
+function pScrPin(){
+ return pNav()+`<div class="pwrap"><div class="pcardc">
+  <div style="text-align:center"><span class="pini" style="position:static;display:inline-flex">${pIni()}</span><br><b>${esc(P.user)}</b></div>
+  <h4 style="text-align:center;margin:.3rem 0 .1rem">PIN Setup for Secondary Login</h4>
+  <div class="mand">Setup a Secondary PIN that can be used for logging in as a witness or secondary user.</div>
+  <div class="fld"><label>Enter Pin 🔒</label><input type="password" inputmode="numeric" maxlength="12" placeholder="Enter Pin" oninput="pinIn(1,this.value)"></div>
+  <div class="fld"><label>Re-Enter Pin 🔒</label><input type="password" inputmode="numeric" maxlength="12" placeholder="Re-Enter Pin" oninput="pinIn(2,this.value)"></div>
+  <div class="hint">Minimum 6 digits, maximum 12. It can be reset any time by these same steps.</div>
+  <div class="brow"><button class="abtn outline sk" onclick="nudge('Set the PIN first 💜')">Cancel</button>
+  <button class="abtn solid tk pulse" id="bt-pin" disabled onclick="pinSetup()">Setup</button></div>
+ </div></div>`}
+function ciCounts(){const d=2-(P.paraDone?1:0)-(P.amlDone?1:0);const c=(P.paraDone?1:0)+(P.amlDone?1:0)+(P.ad.done?1:0);return[d,c]}
+function pScrCiList(){
+ return pNav()+`<div class="pwrap"><div class="plsplit">
+  <div class="leftlist"><b>Service Users (20)</b>
+   <div class="lli pulse" onclick="ciPick('cb')">🔴 Cariotta Bruntje <span class="pchip orange">2</span><br><span class="lls">24-Jun-1925 · Ground Floor</span></div>
+   <div class="lli" onclick="ciPick('x')">Sheridan Cherry <span class="pchip">6</span><br><span class="lls">Chenopodia 14</span></div>
+   <div class="lli" onclick="ciPick('x')">Orel Dunbobbin <span class="pchip">7</span><br><span class="lls">Chenopodia 15</span></div>
+  </div>
+  <div class="rmain"><p style="color:var(--ink-soft);font-size:.8rem;padding:1rem">Click a person with a number to see the medicines the pharmacy has sent for checking in.</p></div>
+ </div></div>`}
+function pScrCiPerson(){
+ const [d,c]=ciCounts();
+ const paraRow=P.paraDone?"":`<div class="prow">
+   <span class="pm"><b>Paracetamol 500mg tablets</b><br><span class="pms">Take two upto four times a day</span></span>
+   <span class="pq">--</span>
+   <input class="pqin" value="${esc(P.dq.para)}" oninput="dqIn('para',this.value)">
+   <button class="pbtn outline ${P.phase==="ciPerson"?"pulse":""}" onclick="ciVerify()">Verify</button>
+   <span class="plink" onclick="ciRejIgn('rej')">Reject</span> / <span class="plink" onclick="ciRejIgn('ign')">Ignore</span></div>`;
+ const amlRow=P.amlDone?"":`<div class="prow">
+   <span class="pm"><b>Amlodipine 5mg tablets</b> <span class="pchip orange">Schedule Clash</span><br><span class="pms">Take one at 8am daily</span></span>
+   <span class="pq">--</span>
+   <input class="pqin" value="${esc(P.dq.aml)}" oninput="dqIn('aml',this.value)">
+   <button class="pbtn orangeb ${P.phase==="ciClashBtn"?"pulse":""}" onclick="${P.phase==="ciClashBtn"?"ciResolve()":"nudge('Verify the Paracetamol first 💜')"}">Resolve</button>
+   <span class="plink" onclick="ciRejIgn('rej')">Reject</span> / <span class="plink" onclick="ciRejIgn('ign')">Ignore</span></div>`;
+ let adArea="";
+ if(P.phase==="adhocSearch"){adArea=`<div class="adbox"><b>Add New Medicine</b>
+   <input class="pqin" style="width:100%" placeholder="🔍 Free type the medicine name…" value="${esc(P.ad.q)}" oninput="adIn(this.value)">
+   <div id="addrop"></div></div>`}
+ else if(P.phase==="adhocQty"){adArea=`<div class="adbox"><span class="pchip">NEW</span> <b>${esc(P.ad.pick)}</b>
+   <div class="prow" style="border:none;padding:.3rem 0 0"><span class="pm">Dispensed Qty →</span>
+   <input class="pqin pulse" placeholder="0" value="${esc(P.ad.qty)}" oninput="adQtyIn(this.value)">
+   <button class="pbtn solid" id="bt-adset" ${parseFloat(P.ad.qty)>0?"":"disabled"} onclick="adSetup()">Setup</button>
+   <span class="plink" onclick="nudge('Keep it — this is the right one 💜')">Remove</span></div></div>`}
+ else if(P.phase==="adhocReview"){adArea=`<div class="adbox"><span class="pchip">NEW</span> <b>${esc(P.ad.pick)}</b> <span class="pchip green">Schedule set ✓</span>
+   <div class="pms">“${esc(P.ad.di)}” · Qty ${esc(P.ad.qty)} · Round 09:00 × ${esc(P.ad.rdose)}</div>
+   <button class="pbtn solid pulse" style="margin-top:.3rem" onclick="adCheckin()">Check-in</button></div>`}
+ return pNav()+`<div class="pwrap">
+  <div class="phead"><b>Cariotta Bruntje</b> <span class="pms">24-Jun-1925 | Ground Floor | Room 185</span>
+   <button class="pbtn outline ${P.phase==="adhocBtn"?"pulse":""}" style="float:right" onclick="adOpen()">Add New Medicine</button></div>
+  <div class="citabs">
+   <span class="cur">Dispensed Medications (${d})</span><span onclick="toast('Adhoc Medications: entries created in the home, like your Oxyact')">Adhoc Medications${P.ad.pick&&!P.ad.done?" (1)":""}</span>
+   <span onclick="toast('Checked-in Medications: everything checked in, and whether it came from pharmacy or was added manually')">Checked-in Medications (${c})</span>
+   <span onclick="toast('Ignored / Rejected: pharmacy data turned away in the home')">Ignored / Rejected</span></div>
+  <div class="pthead"><span class="pm">Medication Name</span><span class="pq">Order Qty</span><span style="width:64px">Dispensed Qty</span><span style="width:150px"></span></div>
+  ${paraRow}${amlRow}
+  ${(P.paraDone&&P.amlDone&&!adArea)?`<p style="color:var(--ink-soft);font-size:.78rem;padding:.5rem">All dispensed items checked in ✓</p>`:""}
+  ${adArea}
+ </div>`}
+function pScrCiReview(){
+ const t=P.ciTab;
+ const tab=(id,lab)=>`<span class="rtab ${t===id?"cur":""}" onclick="ciTabPick('${id}')">${lab}</span>`;
+ let body="";
+ if(t==="bg")body=`<div class="pbox"><b>Brand / Generic</b><div class="pgrid"><span>Dispensed as</span><span><span class="pchip">Generic</span> Paracetamol 500mg tablets</span><span>Last checked in as</span><span><span class="pchip">Generic</span> Paracetamol 500mg tablets</span></div></div>`;
+ if(t==="med")body=`<div class="pbox"><b>Medication</b><div class="pgrid">
+  <span>Medication Name</span><span>Paracetamol 500mg tablets</span>
+  <span>New / Existing</span><span>Existing</span>
+  <span>Generic / Brand</span><span><span class="pchip">Generic</span></span>
+  <span>Dosage</span><span>Take two upto four times a day</span>
+  <span>Quantity Delivered</span><span><b>${esc(P.dq.para)}</b> — the number you typed</span></div></div>`;
+ if(t==="sched")body=`<div class="pbox"><b>Schedule</b><div class="pms" style="margin:.3rem 0">Set up as: PRN (2) — when required, up to four times a day.</div>
+  <button class="pbtn outline" onclick="toast('Edit Schedule opens the round editor — you will do a full edit in the Schedule task 💜')">Edit Schedule</button></div>`;
+ if(t==="set"){const cb=(k,l)=>`<label class="ckbx"><input type="checkbox" ${P.set[k]?"checked":""} onclick="setTgl('${k}')"> ${l}</label>`;
+  body=`<div class="pbox"><b>Settings — Medication Properties</b><div class="ckgrid">
+  ${cb("lt","Long Term")}${cb("am","Administration Managed")}${cb("sc","Stock Counted")}${cb("prn","PRN")}
+  ${cb("cd","Controlled Drug")}${cb("hr","High Risk")}${cb("pain","Pain Level on eMAR")}${cb("qr","QR Code Enabled")}</div>
+  <div class="fld" style="margin-top:.4rem"><label>Follow up Interval (if any)</label><input placeholder="Hr 00:00" value="${esc(P.fui)}" oninput="P.fui=this.value"></div></div>`}
+ if(t==="warn")body=`<div class="pbox"><b>Warnings</b><div class="pms" style="margin-top:.3rem">No clashes for this item ✓<br><br>Ingredient or brand clashes — like Laxido vs Macrogol (same ingredient, different brand) — appear here. One must be stopped and the other started, and the stock altered if it's being returned.</div></div>`;
+ return pNav()+`<div class="pwrap">
+  <div class="phead"><span class="plink" onclick="nudge('Finish the check-in first 💜')">⟵ Back to Service Users</span> &nbsp; <b>Cariotta Bruntje</b></div>
+  <div class="pbox" style="margin:.4rem 0"><span class="pchip orange">Pending Verify</span> <b>Paracetamol 500mg tablets</b> <span class="pchip">Generic</span>
+   <div class="pms">Dosage: Take two upto four times a day · Pharmacy notes: Please refer to the dosage instruction for schedule information</div></div>
+  <div class="rtabs">${tab("bg","Brand / Generic")}${tab("med","Medication")}${tab("sched","Schedule")}${tab("set","Settings")}${tab("warn","Warnings")}
+   <span style="margin-left:auto"></span><button class="pbtn solid" onclick="toast('Review and checkin scrolls you to the button below 💜')">Review and checkin</button></div>
+  ${body}
+  <div style="text-align:center;margin:.6rem 0"><button class="pbtn solid pulse" onclick="ciCheckin()">Check-in</button></div>
+ </div>`}
+function pScrCiClash(){
+ return pNav()+`<div class="pwrap">
+  <div class="phead"><span class="pchip orange">Pending Resolve</span> <b>Amlodipine 5mg tablets</b> <span class="pms">Verify Schedule — PRN · 2 Dosage</span></div>
+  <div class="clsplit">
+   <div class="pbox"><b>Current Cycle</b><div class="pms">Take one at 6am daily</div>
+    <div class="calmini">${["06:00 ①","06:00 ①","06:00 ①","06:00 ①","06:00 ①","06:00 ①"].map(x=>`<span>${x}</span>`).join("")}</div>
+    <button class="pbtn solid" style="margin-top:.4rem" onclick="ciKeep()">Continue Existing Schedule</button></div>
+   <div class="pbox"><b>New Cycle</b><div class="pms">Take one at 8am daily</div>
+    <div class="calmini">${["08:00 ①","08:00 ①","08:00 ①","08:00 ①","08:00 ①","08:00 ①"].map(x=>`<span>${x}</span>`).join("")}</div>
+    <div style="display:flex;gap:.4rem;margin-top:.4rem"><button class="pbtn solid pulse" onclick="ciNew()">Change to New Schedule</button>
+    <button class="pbtn outline" onclick="toast('Edit Schedule lets you fine-tune the new one before accepting')">Edit Schedule</button></div></div>
+  </div></div>`}
+function pScrSchList(){
+ const row=(id,n,pat,rounds,tr,st,pulse)=>`<div class="prow ${pulse?"pulse":""}" onclick="schPick('${id}')" style="cursor:pointer">
+  <span class="pm"><b>${n}</b></span><span class="pq">${pat}</span><span class="pq">${rounds}</span><span class="pq">${tr}</span>
+  <span class="pchip ${st==="Active"?"green":"red"}">${st}</span></div>`;
+ return pNav()+`<div class="pwrap">
+  <div class="phead"><b>Cariotta Bruntje</b> <span class="pms">Ground Floor | Room 185</span>
+   <button class="pbtn outline" style="float:right" onclick="toast('Bulk actions: Amend Stock or Stop Medications for many items at once — untick any that continue')">Bulk actions</button></div>
+  <div class="pthead"><span class="pm">Name</span><span class="pq">Pattern</span><span class="pq">Rounds</span><span class="pq">Trolley (T)</span><span style="width:64px">Status</span></div>
+  ${row("lax","Laxido Orange oral powder sachets sugar free (Galen Ltd)","Daily","Complex","120","Active",P.phase==="schList")}
+  ${row("aml","Amlodipine 5mg tablets","Daily","08:00 (1)","56",P.sp.done?"Stopped":"Active",P.phase==="stopPick")}
+  ${row("x","Paracetamol 500mg tablets","Daily","PRN (2)","401","Active",false)}
+  ${row("x","Aspirin 75mg dispersible tablets","Daily","12:00 (1)","56","Active",false)}
+ </div>`}
+function pScrSchView(which){
+ const lax=which==="lax";
+ return pNav()+`<div class="pwrap">
+  <div class="phead"><b>${lax?"Laxido Orange oral powder sachets sugar free (Galen Ltd)":"Amlodipine 5mg tablets"}</b>
+   <span class="pchip">» Long Term</span> <span class="pchip green">Active</span></div>
+  <div class="rtabs"><span class="rtab cur">Schedule</span><span class="rtab" onclick="toast('Details: the medication properties tickboxes, follow-up interval, warnings and Round Duration for time-specific medicines')">Details</span><span class="rtab" onclick="toast('PRN Protocol: the person-centred rules for when-required medicines')">PRN Protocol</span><span class="rtab" onclick="toast('Stock: the activity, Amend and Audit — coming up in the stock task')">Stock</span><span class="rtab" onclick="toast('Body map: enable and configure application locations')">Body map</span><span class="rtab" onclick="toast('History: every administration')">History</span></div>
+  <div style="display:flex;gap:.5rem;margin:.4rem 0">
+   <button class="pbtn outline ${P.phase==="schView"?"pulse":""}" onclick="schEditOpen()">✎ Edit Schedule</button>
+   <button class="pbtn danger ${P.phase==="stopView"?"pulse":""}" onclick="schStopOpen()">⊘ Stop</button></div>
+  <div class="calmini big">${(lax?["08:00 ⓪","12:00 ⓪","16:00 ⓪"]:["08:00 ①"]).map(x=>`<span>${x}</span>`).join("")} <span class="pms">× every day this cycle</span></div>
+  <div class="pbox"><b>Schedule 1</b><div class="pms">From 13/Dec 00:00 &nbsp; To 09/Jan 23:59<br>Dosage Instructions: ${lax?"Take ONE to TWO sachets THREE times daily":"Take one at 8am daily"}</div></div>
+ </div>`}
+function pScrSchEdit(){
+ return pNav()+`<div class="pwrap">
+  <div class="phead">⟵ <b>Edit Schedule</b> <span class="pms">All fields marked with * are mandatory</span></div>
+  <div class="fld"><label>* Dosage Instructions</label><input value="Take ONE to TWO sachets THREE times daily"></div>
+  <div class="fld"><label>* Notes <span class="req">(why is this changing?)</span></label>
+   <input placeholder="Please add notes." value="${esc(P.se.note)}" oninput="seNoteIn(this.value)"></div>
+  <div style="display:flex;gap:.5rem"><div class="fld" style="flex:1"><label>Start Date</label><input value="06/Feb 00:00" onclick="penTap()" readonly></div>
+   <div class="fld" style="flex:1"><label>End Date</label><input value="06/Mar 23:59" onclick="penTap()" readonly></div></div>
+  <div class="fld"><label>Frequency</label><div class="pms">◉ Daily &nbsp; ◯ Weekly &nbsp; ◯ Monthly &nbsp; ◯ Custom · Repeats every 1 Day(s)</div></div>
+  <div class="pbox"><b>Round &nbsp;·&nbsp; Dosage</b>
+   <div class="prow" style="border:none"><span class="pq">08:00</span><input class="pqin" value="1" oninput=""></div>
+   <div class="prow" style="border:none"><span class="pq">12:00</span><input class="pqin pulse" value="${esc(P.se.d12)}" oninput="seD12(this.value)"></div>
+   <div class="prow" style="border:none"><span class="pq">16:00</span><input class="pqin" value="1"></div>
+   <span class="plink" onclick="toast('Add Round adds another time · Add PRN adds a when-required slot')">Add Round · Add PRN</span></div>
+  <div style="text-align:right;margin-top:.5rem"><button class="pbtn solid pulse" id="bt-se" ${P.se.note.trim().length>=5?"":"disabled"} onclick="seSave()">Save</button>
+   <span class="plink" onclick="nudge('Nearly there — note, then Save 💜')">Reset</span></div>
+ </div>`}
+function pScrStopForm(){
+ return pNav()+`<div class="pwrap">
+  <div class="phead">⟵ <b>Stop Medication</b></div>
+  <div class="vban">ⓘ Stopping a medication will stop any rounds from the selected stop date. Once stopped it will not be auto-extended. Please choose how the stock should be managed and amend the stock accordingly.</div>
+  <div class="fld"><label>Stop Date and Time</label><input value="${todayStr()} ${nowT()}" onclick="penTap()" readonly></div>
+  <div class="fld"><label>Notes <span class="req">*</span></label><input placeholder="Explain why this change is being made" value="${esc(P.sp.note)}" oninput="spNoteIn(this.value)"></div>
+  <div class="pbox"><b>Selected Medication</b>
+   <div class="prow" style="border:none"><span class="pm">Amlodipine 5mg tablets</span>
+   <span class="destopt ${P.sp.dest==="Returned"?"sel":""}" data-d="Returned" onclick="spDest('Returned')">◯ Returned</span>
+   <span class="destopt ${P.sp.dest==="Destroyed"?"sel":""}" data-d="Destroyed" onclick="spDest('Destroyed')">◉ Destroyed</span></div></div>
+  <div style="text-align:right;margin-top:.5rem"><button class="pbtn solid pulse" id="bt-sp" ${P.sp.note.trim().length>=5?"":"disabled"} onclick="spSave()">Amend Stock and Stop</button>
+   <span class="plink" onclick="nudge('Finish the stop — note first 💜')">Cancel</span></div>
+ </div>`}
+function pScrOrdList(){
+ const cnt=(P.or.n1?1:0)+(P.or.n2?1:0);
+ const row=(n,name,ins,stock,on,q)=>`<div class="prow"><span class="pm"><b>${name}</b> <span class="pchip green">Active</span><br><span class="pms">${ins}</span></span>
+  <span class="pq">S0 T${stock}</span>
+  ${on?`<input class="pqin" value="${esc(q)}" oninput="orQ(${n},this.value)"><button class="pbtn danger" onclick="orNew(${n})">Remove</button>`
+      :`<span style="width:56px"></span><button class="pbtn solid ${cnt<2?"pulse":""}" onclick="orNew(${n})">New</button>`}</div>`;
+ return pNav()+`<div class="pwrap">
+  <div class="phead"><span class="pchip">Previous [13-Dec]</span> <span class="pchip green">Current [10-Jan]</span> <span class="pchip">Next [07-Feb]</span>
+   <button class="pbtn solid" style="float:right" onclick="orPdf()">Next Cycle Order Report For All Service Users (PDF)</button></div>
+  <div class="phead"><b>Cariotta Bruntje</b> <span class="pms">Ground Floor | Room 185</span></div>
+  ${row(1,"Laxido Orange oral powder sachets sugar free (Galen Ltd)","Take ONE to TWO sachets THREE times daily","120",P.or.n1,P.or.q1)}
+  ${row(2,"Paracetamol 500mg tablets","Take two upto four times a day","200",P.or.n2,P.or.q2)}
+  <div style="display:flex;justify-content:space-between;margin-top:.5rem">
+   <span class="plink" onclick="orPdf()">Next Cycle Order Report (PDF)</span>
+   <span><button class="pbtn solid ${cnt===2?"pulse":""}" onclick="orSave()">Save [${cnt}]</button>
+   <span class="plink" onclick="nudge('Save the order 💜')">Reset</span></span></div>
+ </div>`}
+function pScrStkView(){
+ return pNav()+`<div class="pwrap">
+  <div class="phead"><b>Laxido Orange oral powder sachets sugar free (Galen Ltd)</b> <span class="pchip">» Long Term</span> <span class="pchip green">Active</span></div>
+  <div style="display:flex;gap:.5rem;margin:.3rem 0">
+   <button class="pbtn outline" onclick="stkAudit()">Audit</button>
+   <button class="pbtn outline pulse" onclick="stkAmendOpen()">Amend</button>
+   <span class="pms" style="margin-left:auto">Last Updated ${todayStr()} · Last CheckedIn ${todayStr()}</span></div>
+  <div class="pthead"><span class="pm">Activity Type</span><span class="pq">Quantity</span><span class="pq">Events</span></div>
+  <div class="prow"><span class="pm">Checkin</span><span class="pq">0 / +120</span><span class="pq">2</span></div>
+  <div class="prow"><span class="pm">Med Actions</span><span class="pq">0 / 0</span><span class="pq">45</span></div>
+  <div class="prow"><span class="pm">Audit</span><span class="pq">0 / 0</span><span class="pq">2</span></div>
+ </div>`}
+function pScrStkAmend(){
+ const ok=(String(P.sk2.s).trim()!==""||String(P.sk2.t).trim()!=="")&&P.sk2.note.trim().length>=5;
+ return pNav()+`<div class="pwrap">
+  <div class="phead">⟵ <b>Amend Stock</b></div>
+  <div class="pthead"><span class="pm">Drug Name</span><span class="pq">Current</span><span style="width:130px">Other (S | T)</span><span style="width:120px">Returned · Lost · Destroyed</span></div>
+  <div class="prow"><span class="pm">Laxido Orange oral powder sachets sugar free (Galen Ltd)</span>
+   <span class="pq">0 / +120</span>
+   <span style="display:flex;gap:.25rem"><input class="pqin pulse" placeholder="S" value="${esc(P.sk2.s)}" oninput="sk2In('s',this.value)"><input class="pqin pulse" placeholder="T" value="${esc(P.sk2.t)}" oninput="sk2In('t',this.value)"></span>
+   <span class="plink" onclick="sk2Other()">S T · S T · S T</span></div>
+  <div class="fld"><label>Notes <span class="req">*</span></label><input placeholder="Explain why this change is being made" value="${esc(P.sk2.note)}" oninput="sk2In('note',this.value)"></div>
+  <div style="text-align:right"><button class="pbtn solid ${ok?"pulse":""}" id="bt-sk2" ${ok?"":"disabled"} onclick="sk2Save()">Save</button>
+   <span class="plink" onclick="nudge('Numbers and note first 💜')">Cancel</span></div>
+ </div>`}
+function pScrRepForm(){
+ return pNav()+`<div class="pwrap"><div class="plsplit">
+  <div class="leftlist"><b>Service Users (22)</b> <span class="plink" onclick="toast('Select All builds one big report')">Select All</span>
+   <div class="lli ${P.rp.person?"sel":"pulse"}" onclick="rpPick('cb')">${P.rp.person?"☑":"☐"} Cariotta Bruntje<br><span class="lls">24-Jun-1925 · Ground Floor · 185</span></div>
+   <div class="lli" onclick="rpPick('x')">☐ Celka Tyas<br><span class="lls">31-Jan-1945 · Ground Floor · 182</span></div>
+   <div class="lli" onclick="rpPick('x')">☐ Desdemona Scrauniage<br><span class="lls">26-Oct-1932 · Ground Floor · 181</span></div>
+  </div>
+  <div class="rmain"><b>MAR Report PDF</b>
+   <div class="fld" style="max-width:180px"><label>Select the from date:</label><input value="01/${todayStr().slice(3)}" onclick="penTap()" readonly></div>
+   <div class="pms">◉ Generate MAR Chart &nbsp; ◯ Generate blank MAR Chart</div>
+   <button class="pbtn solid ${P.rp.person?"pulse":""}" style="margin-top:.5rem" onclick="rpShow()">Show Report</button></div>
+ </div></div>`}
+function pScrRepView(){
+ const cell=(k)=>`<span class="marcell ${k}">${k==="ok"?"1":(k==="miss"?"▲":"×")}</span>`;
+ const strip=(a)=>a.map(cell).join("");
+ return pNav()+`<div class="pwrap">
+  <div style="text-align:right"><button class="pbtn solid pulse" onclick="rpPrint()">Print</button></div>
+  <div class="marhead"><b>Cariotta Bruntje</b> (24-Jun-1925) &nbsp; <span style="float:right">MAR CHART [ ${todayStr()} → +28 days ]</span></div>
+  <div class="pms" style="border:1px solid var(--line);border-radius:0 0 8px 8px;padding:.4rem .5rem">
+   Carehome: Hazel House · Ward: Ground Floor · Room: 185 &nbsp;|&nbsp; GP: Dr Smith, Croxley Surgery<br>
+   Notes: Likes to take Morning Medications with Orange juice · Allergies: <b>Penicillin, Nuts, Simvastatin</b></div>
+  <div class="pbox" style="margin-top:.4rem"><b>Amlodipine 5mg tablets</b> — Take 1 in the Morning · 08:00
+   <div class="marrow">${strip(["ok","ok","ok","ok","x","miss","ok","ok"])}</div></div>
+  <div class="pbox"><b>Aspirin 75mg dispersible tablets</b> — ONE to be taken daily · 12:00
+   <div class="marrow">${strip(["ok","ok","ok","ok","ok","ok","ok","ok"])}</div></div>
+  <div class="pms">1 = given &amp; signed · × = skipped with reason · ▲ = missed signature</div>
+ </div>`}
+function pScrEnd(){
+ return `<div class="endwrap">
+  <div style="font-size:2.4rem">🎉</div><h3>Portal round complete — signed out!</h3>
+  <p style="color:var(--ink-soft)">Everything the office side asks of you, ${esc(P.user||"superstar")} — typed by your own hand:</p>
+  <ul>
+   <li>✓ Logged in at emar.vcaresystems.co.uk as yourself</li>
+   <li>✓ Read the live dashboard</li>
+   <li>✓ Set your witness PIN (••••••)</li>
+   <li>✓ Checked in the Paracetamol — qty ${esc(P.dq.para)} — through all five review tabs</li>
+   <li>✓ Resolved the Amlodipine schedule clash to the new 08:00</li>
+   <li>✓ Added ${esc(P.ad.pick||"Oxyact 20mg tablets")} manually — “${esc(P.ad.di||"…")}”, qty ${esc(P.ad.qty||"28")}</li>
+   <li>✓ Edited the Laxido 12:00 dose to ${esc(P.se.d12)} — note: “${esc(P.se.note||"…")}”</li>
+   <li>✓ Stopped Amlodipine (${esc(P.sp.dest)}) — note: “${esc(P.sp.note||"…")}”</li>
+   <li>✓ Placed the repeat order (Save [2]) and read the Order Request ticks</li>
+   <li>✓ Moved stock Shelf→Trolley (${esc(P.sk2.s||"-28")} / ${esc(P.sk2.t||"28")}) with a note</li>
+   <li>✓ Generated and printed Cariotta's MAR chart</li>
+   <li>✓ Signed out</li>
+  </ul>
+  <p style="color:var(--ink-soft)">That's the day-to-day of the <b>55-page Portal guide</b>. The admin pages (adding people, absences, PRN protocols, body-map &amp; vitals set-up) are in the Part 2 reading sections. 💜</p>
+  <div class="navrow" style="justify-content:center">
+   <button class="btn btn-ghost" onclick="pSimStart(0)">↺ Do the Portal round again</button>
+   <button class="btn btn-primary" onclick="goHome()">Back to the guide</button>
+  </div></div>`}
+function pPopHtml(){
+ if(!P.pop)return "";
+ const card=(h,p,btns)=>`<div class="popc"><div class="popcard"><h5>${h}</h5><p>${p}</p><div class="poprow">${btns}</div></div></div>`;
+ if(P.pop==="ciOk")return card("Checkin Status - Successful","<b>Paracetamol 500mg tablets</b> has been checked in.",`<button class="abtn solid pulse" style="flex:0;padding:.4rem 1.2rem" onclick="ciPopOk()">Ok</button>`);
+ if(P.pop==="ciOk2")return card("Checkin Status - Successful","<b>Amlodipine 5mg tablets</b> has been checked in — new schedule starts next cycle.",`<button class="abtn solid pulse" style="flex:0;padding:.4rem 1.2rem" onclick="ciPopOk2()">Ok</button>`);
+ if(P.pop==="adOk")return card("Checkin Status - Successful","<b>"+esc(P.ad.pick)+"</b> has been checked in.",`<button class="abtn solid pulse" style="flex:0;padding:.4rem 1.2rem" onclick="adPopOk()">Ok</button>`);
+ if(P.pop==="ordOk")return card("Order Request","An order request is currently being sent.<br><br>${(P.or.n1?\"✅ Laxido Orange sachets — Save ✓<br>\":\"\")}${(P.or.n2?\"✅ Paracetamol 500mg tablets — Save ✓<br>\":\"\")}<span style='color:#b91c1c'>(If an order fails, it shows here in red with the reason — e.g. a request already pending in the past 30 days.)</span>",`<button class="abtn solid pulse" style="flex:0;padding:.4rem 1.2rem" onclick="orClose()">Close</button>`);
+ return ""}
+function pScreen(){
+ const p=P.phase;
+ if(["purl","pchoose","puser","ppass"].includes(p))return (p==="purl"?`<div class="lg"><div class="cap" style="font-size:.85rem">A blank browser tab — click the address bar above ⤴</div></div>`:pScrLogin());
+ if(p==="pend")return pScrEnd();
+ if(p==="pinForm")return pScrPin();
+ if(p==="ciList")return pScrCiList();
+ if(["ciPerson","ciClashBtn","adhocBtn","adhocSearch","adhocQty","adhocReview"].includes(p))return pScrCiPerson();
+ if(p==="ciReview")return pScrCiReview();
+ if(p==="ciClash")return pScrCiClash();
+ if(["schList","stopPick"].includes(p))return pScrSchList();
+ if(p==="schView")return pScrSchView("lax");
+ if(p==="stopView")return pScrSchView("aml");
+ if(p==="schEdit")return pScrSchEdit();
+ if(p==="stopForm")return pScrStopForm();
+ if(p==="ordList")return pScrOrdList();
+ if(p==="stkView")return pScrStkView();
+ if(p==="stkAmend")return pScrStkAmend();
+ if(p==="repForm")return pScrRepForm();
+ if(p==="repView")return pScrRepView();
+ if(p==="adhocSched")return pNav()+`<div class="pwrap"><div class="pcardc">
+   <h4>Schedule Pattern</h4>
+   <div class="fld"><label>Dosage Instructions <span class="req">*</span></label>
+    <input placeholder="e.g. Take as required for pain" value="${esc(P.ad.di)}" oninput="adDiIn(this.value)"></div>
+   <div style="display:flex;gap:.5rem"><div class="fld" style="flex:1"><label>Start Date</label><input value="${todayStr()} 00:00" readonly onclick="penTap()"></div>
+    <div class="fld" style="flex:1"><label>End Date</label><input value="+28 days 23:59" readonly onclick="penTap()"></div></div>
+   <div class="fld"><label>Frequency</label><div class="pms">◉ Daily · Repeats every 1 Day(s)</div></div>
+   <div class="prow" style="border:none"><span class="pq">Round 09:00</span><span class="pms">Dosage →</span>
+    <input class="pqin pulse" value="${esc(P.ad.rdose)}" oninput="adRdIn(this.value)">
+    <span class="plink" onclick="toast('Add Round adds another time · Add PRN makes it when-required')">Add Round · Add PRN</span></div>
+   <div style="text-align:right;margin-top:.4rem"><button class="pbtn solid pulse" id="bt-adsave" ${P.ad.di.trim().length>=8?"":"disabled"} onclick="adSave()">Save</button>
+    <span class="plink" onclick="nudge('Save the pattern first 💜')">Clear all</span></div>
+  </div></div>`;
+ return pScrDash();
+}
+function renderPSim(){
+ const ck=pCoachKey(),c=PCOACH[ck]||{t:""};
+ const urlPulse=(P.phase==="purl")?"pulse":"";
+ app.innerHTML=`
+  <div class="crumb no-print"><button class="back" onclick="goHome()">‹ Back to the guide</button>
+   <span class="where">Practice Portal · Task ${Math.min(P.task+1,PTASKS.length)} of ${PTASKS.length} — ${PTASKS[Math.min(P.task,PTASKS.length-1)][0]}</span></div>
+  ${P.phase!=="pend"?`<div class="coach"><span class="cico">👩‍🏫</span><span class="ctxt">${c.t}</span>${c.next?`<button class="cbtn" onclick="pCoachNext()">Next ›</button>`:""}</div>`:""}
+  <div class="tabfr"><div class="tab" style="min-height:560px">
+   <div class="bbar"><span>◀</span><span>▶</span><span>⟳</span><span class="burl ${urlPulse}" onclick="pUrlGo()">🔒 emar.vcaresystems.co.uk</span><span>⋮</span></div>
+   ${pScreen()}${pPopHtml()}
+  </div></div>
+  <p class="no-print" style="margin-top:.7rem;font-size:.9rem;color:var(--ink-soft)">Jump to a Portal task:
+   ${PTASKS.map((t,i)=>`<button class="tchip ${pDone.has(i)?"done":""}" onclick="pSimStart(${i})">${pDone.has(i)?"✓ ":""}${i+1}. ${t[0]}</button>`).join(" ")}</p>`;
+}
+
+/* ================= lessons ================= */
+const MODULES=[
+{ title:"Logging in", blurb:"Opening the app and getting to your floor's medicines.", steps:[
+ {t:"Find the right app icon", h:`
+   <p>On the tablet you may see <b>two</b> Camascope icons. Always tap the purple one called <b>Camascope&nbsp;2.0</b> — not “Classic Camascope”.</p>`},
+ {t:"Tap Login", h:`
+   <p>The first screen says <i>“Connecting the dots in care!”</i>. Tap the purple <kbd class="app">Login</kbd> button. It takes you to a login page and then brings you back to the app.</p>`},
+ {t:"Type your username, then your password", h:`
+   <p>The login comes in <b>two parts</b>:</p>
+   <ol><li>Type your <b>username</b> and tap <kbd class="app">Sign In</kbd>.</li>
+   <li>The password page then appears — type your <b>password</b> and tap <kbd class="app">Sign In</kbd> again.</li></ol>
+   <div class="tip"><b>💜 Forgotten your details?</b> Tap “Forgot Password?” or ask your administrator. Passwords can only be <i>changed</i> on the Camascope Portal website — the same username and password work for both the app and the Portal.</div>`},
+ {t:"Choose your care home and floor", h:`
+   <p>Pick your home (e.g. “Hazel House”) from the drop-down, then choose which <b>ward/unit</b> you're working on — e.g. <i>Ground Floor</i>. Only the people who live in that area will show. Tap <kbd class="app">Continue</kbd> and wait for the loading screen.</p>
+   <div class="note"><b>ℹ Changing floor later?</b> Tap the ☰ menu (top-left) and choose <b>Change Ward</b>.</div>`},
+ {t:"Now try it yourself", h:`
+   <p>The practice tablet below looks and behaves like the real thing — same screens, same buttons. Your coach (👩‍🏫) tells you exactly what to tap, every step.</p>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(0)">🖥 Practise logging in on the tablet</button></div>`}
+]},
+{ title:"Reading the main screen", blurb:"Columns, colours, and the six symbols.", steps:[
+ {t:"The big grid", h:`
+   <p>After logging in you land on the <b>MAR status screen</b>. It's a grid:</p>
+   <ul><li><b>Down the left:</b> the people in your ward, with photo, date of birth and room number.</li>
+   <li><b>Across the top:</b> the rounds — <b>Morning · Noon · Evening · Night · PRN</b>. The current round is highlighted purple.</li>
+   <li>Each square shows <b>symbols with numbers</b> — the number is how many medicines, the symbol is their status.</li></ul>`},
+ {t:"The six symbols to learn", h:`
+   <div class="symgrid">
+     <div class="symcard"><span class="ic">${IC.taken(44)}</span><div><h4>Given ✓</h4><p>Administered and signed for.</p></div></div>
+     <div class="symcard"><span class="ic">${IC.due(44)}</span><div><h4>Due now</h4><p>Due in the current time frame.</p></div></div>
+     <div class="symcard"><span class="ic">${IC.sched(44)}</span><div><h4>Scheduled, not due yet</h4><p>Coming up later.</p></div></div>
+     <div class="symcard"><span class="ic">${IC.skip(44)}</span><div><h4>Skipped</h4><p>Not given, <i>with a reason recorded</i>.</p></div></div>
+     <div class="symcard"><span class="ic">${IC.missed(44)}</span><div><h4>Missed ⚠</h4><p>Missing signature — needs attention.</p></div></div>
+     <div class="symcard"><span class="ic">${IC.prn(44)}</span><div><h4>PRN</h4><p>“When required” medicines.</p></div></div>
+   </div>`},
+ {t:"Symbol game — have a go!", h:`
+   <div class="pad"><div class="pad-title">Practice — tap the right symbol</div>
+     <div class="game-q" id="gq"></div><div class="gamerow" id="grow"></div><div class="game-fb" id="gfb"></div></div>`, init:"game"},
+ {t:"Corner buttons & handy extras", h:`
+   <ul>
+     <li><b>Online / Offline</b> — if it turns orange, don't panic: the app works offline for up to <b>24 hours</b>.</li>
+     <li><b>Refresh</b> reloads; <b>Today</b> (calendar) lets you look back at previous days; <b>your name</b> shows who's logged in — check it's you.</li>
+     <li><b>Filter tiles</b> (<span class="badge">CD</span> <span class="badge">PRN</span>…) show only that kind of medicine; the <b>Due switch</b> shows only what's due right now.</li>
+     <li><b>☰ menu</b> — change ward, Service Users, log out.</li>
+   </ul>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(1)">🖥 Take the guided tour on the tablet</button></div>`}
+]},
+{ title:"Giving a scheduled medicine", blurb:"Your everyday round — then do it on the tablet.", steps:[
+ {t:"Open the person's round", h:`
+   <p>On the grid, tap the symbol in the <b>current round's column</b> on your person's row (e.g. the orange clock under “Evening”). Their medicine list opens — medicines still due sit at the top.</p>`},
+ {t:"Check it's the right person — every time", h:`
+   <p>The left of the screen always shows their <b>photograph</b>, their <b>allergies</b>, and their <b>notes</b> (e.g. <i>“Likes to take Morning Medications with Orange juice”</i>).</p>
+   <div class="warn"><b>⚠ Golden rule</b> Right person, right medicine, right dose, right time, right route — the app helps, but your eyes make the final check.</div>`},
+ {t:"Tap the medicine, read, give, Take", h:`
+   <ol><li>Tap the medicine — the form opens with the <b>Dosage box (editable)</b>, <b>route</b>, <b>last taken</b>, today's date &amp; time (✎ to adjust), and a <b>Note</b> box you can type in or dictate 🎤. Stock count sits top-right; <b>More Info</b> holds BNF warnings and 14 days of history.</li>
+   <li>Give the medicine to the person.</li>
+   <li>Tap <kbd class="app">Take</kbd> — the entry turns <b>green</b>, moves to the bottom, and records dose, time and <b>your name</b>.</li></ol>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(2)">🖥 Practise giving a medicine on the tablet</button></div>`}
+]},
+{ title:"“Take All” — a whole round at once", blurb:"Working through every medicine in one go.", steps:[
+ {t:"How Take All works", h:`
+   <ol><li>Tap <kbd class="app">Take All</kbd> at the bottom of the person's list.</li>
+   <li>Each medicine pops up with its instructions — <b>prepare the dose</b> as shown, then next.</li>
+   <li>At the end a <b>tick list</b> shows everything prepared — give them, then tap <kbd class="app">Submit</kbd> to sign the lot in one go.</li></ol>
+   <div class="tip"><b>💜 Also there:</b> <kbd class="appghost">Skip All</kbd>, for when a whole round can't be given (e.g. the person is in hospital).</div>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(8)">🖥 Practise a “Take All” round</button></div>`}
+]},
+{ title:"Controlled drugs (CD) — with a witness", blurb:"Two people, one PIN — Take stays grey until it's done.", steps:[
+ {t:"Spotting a CD and why Take is grey", h:`
+   <p>Controlled drugs carry a <span class="badge">CD</span> tag (often with <span class="badge">WIT</span>). Two people are needed: you, plus a colleague who watches and confirms. Until a witness is added, the <kbd class="app">Take</kbd> button is <b>greyed out</b> and won't work.</p>`},
+ {t:"Adding the witness", h:`
+   <ol><li>Tap <kbd class="appghost">Add Witness</kbd> — it says <i>(Mandatory witness)</i> underneath.</li>
+   <li>Your colleague picks <b>their own username</b> from the drop-down.</li>
+   <li>They type <b>their PIN</b> and tap <kbd class="app">Login</kbd>.</li></ol>
+   <p><i>“Witnessed by [name]”</i> appears and Take lights up purple. Give the medicine, tap Take — both names go into the history.</p>
+   <div class="note"><b>ℹ About the PIN</b> Each staff member sets their own 6–12 digit witness PIN on the Camascope Portal (initials → Manage account → Secondary Pin). It's only used for witnessing.</div>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(3)">🖥 Practise a CD with a witness</button></div>`}
+]},
+{ title:"Medicines that ask for vitals first", blurb:"Blood pressure and other checks the app insists on.", steps:[
+ {t:"Record the reading, then read the instructions", h:`
+   <p>Some medicines (set up by your manager) can't be recorded until a check is done — e.g. blood pressure before Ramipril.</p>
+   <ol><li>Tap the medicine — <i>“You must record the vital for this medication.”</i></li>
+   <li>Enter the reading (Systolic + Diastolic) and the person's <b>position</b>: Sitting, Standing or Lying → <kbd class="app">Continue</kbd>.</li>
+   <li>An <b>instructions page</b> written by your service appears — when <b>not</b> to give it and who to contact. <b>Read it carefully</b>, then <kbd class="app">Continue</kbd> records the medicine.</li></ol>
+   <div class="warn"><b>⚠ Reading outside the safe range?</b> Follow the on-screen instructions exactly. When in doubt, don't give it — and ask.</div>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(4)">🖥 Practise a vitals check</button></div>`}
+]},
+{ title:"PRN — “when required” medicines", blurb:"The note is compulsory, and there may be a follow-up.", steps:[
+ {t:"Where PRNs live & the protocol", h:`
+   <p><b>PRN</b> means “when required” — e.g. paracetamol for pain. They sit at the <b>bottom</b> of the person's list and in the PRN column. If one is waiting when you move on, a pop-up asks if you'd like to give it now.</p>
+   <p>On a PRN, <b>More Info</b> holds the person's <b>PRN protocol</b>: max in 24 hours, minimum gap between doses, and what to do if it doesn't help. Check it — and check <b>“Last taken”</b> — before giving.</p>`},
+ {t:"The compulsory note & the follow-up", h:`
+   <p>You <b>must type a note</b> saying <i>why</i> they need it (e.g. <i>“Cariotta requested for pain”</i>) — Take stays locked until it's in. Don't like typing? Tap the <b>microphone 🎤</b> and speak.</p>
+   <p>If a <b>follow-up</b> is set, a <b>⚑ flag</b> appears with the time to check it worked. Tap the flag later and record the outcome.</p>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(5)">🖥 Practise the PRN pop-ups + follow-up</button></div>`}
+]},
+{ title:"Skipping a medicine (with a reason)", blurb:"Refused, asleep, unwell — never leave it blank.", steps:[
+ {t:"Why and how to skip", h:`
+   <p>If a medicine isn't taken, record it as <b>Skipped</b> — an entry with nothing recorded shows as red “missed” ${IC.missed(20)} and looks like a mistake.</p>
+   <ol><li>Tap the medicine → <kbd class="appghost">Skip</kbd>.</li>
+   <li><b>Reduce stock by</b> — if the dose was already popped out, enter how many were wasted.</li>
+   <li><b>Reason for Skip</b> — Refused · Hospitalised · Nausea · On Leave · Destroyed · Sleeping · Pulse Abnormal · Offered – Not Required · Medication Not Available · Strength Not Required · Other.</li>
+   <li><b>Note</b> (compulsory) — what actually happened, typed or dictated 🎤.</li>
+   <li>Tap <kbd class="app">Skip</kbd> — the entry turns <b>orange</b> and the grid shows the orange ! symbol.</li></ol>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(7)">🖥 Practise skipping a refused medicine</button></div>`}
+]},
+{ title:"Creams, patches & body maps", blurb:"Recording where on the body something was applied.", steps:[
+ {t:"Using the body map", h:`
+   <p>Creams, patches and injections have a <b>body-map icon</b>. When you take them, a body outline appears (Front / Back):</p>
+   <ol><li>Tap the location — e.g. <i>Upper Arm (Right)</i>.</li>
+   <li>For rotating items like weekly patches, the app remembers previous spots (“6 days ago”) and marks the next area <b>Suggested</b> — so skin gets a rest.</li>
+   <li><kbd class="app">Continue</kbd> to finish signing as normal.</li></ol>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(6)">🖥 Practise the body map</button></div>`}
+]},
+{ title:"Photos, logging out & odds and ends", blurb:"Photos, finishing your shift, offline mode, and the videos.", steps:[
+ {t:"Adding or updating someone's photo", h:`
+   <ol><li>☰ menu → <b>Service Users</b> → tap the person → <kbd class="app">Edit Profile</kbd> → <kbd class="appghost">Change Photo</kbd>.</li>
+   <li>Allow the camera, take the photo, check it's a <b>true likeness</b>, tap <kbd class="app">Save</kbd> — then Save again at the bottom.</li></ol>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(9)">🖥 Practise adding the photo</button></div>`},
+ {t:"Always log out — and don't fear ‘offline’", h:`
+   <p>When your medicines are done: ☰ menu → <kbd class="app">Logout</kbd>. Records are signed in the name at the top-right — logging out protects <i>you</i>.</p>
+   <p>If the wifi symbol goes orange (<b>offline</b>), keep going — the app works for up to <b>24 hours</b> offline and syncs when it's back.</p>
+   <div class="launch"><button class="btn btn-primary" onclick="simStart(9)">🖥 Practise the photo + logging out</button></div>`},
+ {t:"More help & the official videos", h:`
+   <p><b>Camascope Support:</b> ☎ 020&nbsp;8638&nbsp;7291 · ✉ support@camascope.com</p>
+   <p>Camascope's own short videos cover these exact tasks (internet needed):</p>
+   <ul class="videolist">
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDLdA7BQ/cpTtLDglaMbtuNXXkCRmBw/view?utm_content=DAGwDLdA7BQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hc09f688601">▶ Introduction to the Camascope App</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDigBhrI/-bArD5oVThW4Hk49qP5yRw/view?utm_content=DAGwDigBhrI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=he3a6486724">▶ Administering pre-breakfast medicines</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDJbwy7g/6DtvN9u_gTx9MF3F_dBYeQ/view?utm_content=DAGwDJbwy7g&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hdf3b1aa3dd">▶ Administering medications</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDY8TVK8/AbicCddRfNrrvxttqshUYg/view?utm_content=DAGwDY8TVK8&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h41d90603b4">▶ Using “Take All”</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDoWMxt8/Ke4RybxcYw5l9oAKN_7vdw/view?utm_content=DAGwDoWMxt8&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hec78fe1ab8">▶ Skipping a medicine</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDozCsuE/j6NspYLEunVRkx1nsdiZ1Q/view?utm_content=DAGwDozCsuE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h6239a0ca3c">▶ PRN medicines &amp; follow-ups</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDlTvQWA/sfDAKTBMkYwfMvug7AIXoA/view?utm_content=DAGwDlTvQWA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hc06e4aa221">▶ High-risk medicines</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDj4MuVo/IVNoVJYwayLWfd05mabxIg/view?utm_content=DAGwDj4MuVo&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h79fdb20092">▶ Items with a body map</a></li>
+     <li><a target="_blank" rel="noopener" href="https://www.canva.com/design/DAGwDeMpFH4/2zCcx6BAiJadgn5jzsnfzg/view?utm_content=DAGwDeMpFH4&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hca269e8ea3">▶ Controlled drugs</a></li>
+   </ul>`}
+]}
+];
+
+const PORTAL_MODULES=[
+{ title:"Portal: what it is & logging in", blurb:"The office website behind the app — same login, browser-based.", steps:[
+ {t:"The other half of Camascope", h:`
+   <p>The tablet app is for <b>giving</b> medicines. The <b>Camascope Portal</b> is the website on the office computer where everything is <b>set up and managed</b> — ordering, checking in deliveries, stopping medicines, running reports and printing MAR charts. Everything done on the Portal appears live on the app, and everything done on the app is visible on the Portal.</p>
+   <p>The address is <b>https://emar.vcaresystems.co.uk</b> — and your <b>username and password are the same</b> as the app.</p>
+   <ol><li>Open the address in the browser.</li><li>On “Choose an account”, click <b>Another User</b> (never someone else's saved account).</li><li>Username → Sign In → password → Sign In — the same two-part login as the tablet.</li></ol>
+   <p>When you finish: click your <b>initials</b> (top-right) → <kbd class="app">Sign out</kbd>.</p>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(0)">💻 Practise logging in to the Portal</button>
+   <button class="btn btn-ghost" onclick="pSimStart(8)">💻 Practise signing out</button></div>`}
+]},
+{ title:"Portal: your dashboard at a glance", blurb:"Live totals from the rounds, and the panels that need action.", steps:[
+ {t:"The tiles", h:`
+   <ul>
+    <li><b>Service Users</b> — active people, and how many are marked absent (hospital or leave).</li>
+    <li><b>Missed</b> — medication with <b>no signature at all</b>. These need chasing.</li>
+    <li><b>Delayed</b> — given, but later than the round time.</li>
+    <li><b>Skipped</b> — not given, with a reason (e.g. refused).</li>
+    <li><b>PRN Admins</b> — when-required medicines given · <b>Follow Ups</b> — follow-ups completed.</li>
+   </ul>`},
+ {t:"The panels", h:`
+   <ul>
+    <li><b>Pending Check-In</b> — medicines the pharmacy has sent, waiting to be checked in (with a count per person).</li>
+    <li><b>Medication Alerts</b> — a person with <b>two medicines sharing an ingredient</b> (potential clash), plus stopped/stopping items.</li>
+    <li><b>Missed Actions [48 Hrs]</b> — missing signatures and missed follow-ups from the last two days only.</li>
+    <li><b>Service User Status</b> — who's marked on leave or no longer in the home.</li>
+    <li><b>Stock Alerts</b> — negative figures, low stock, and stopped medicines still holding stock.</li>
+   </ul>
+   <div class="note"><b>ℹ More than one home?</b> The <b>Account Dashboard</b> (Dashboards tab) shows an overview of every home you have access to, and you can open each from the list.</div>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(1)">💻 Take the dashboard tour</button></div>`}
+]},
+{ title:"Portal: passwords & your witness PIN", blurb:"Passwords change here only — and the PIN that lets you witness.", steps:[
+ {t:"Changing your password", h:`
+   <p>Passwords can <b>only</b> be changed on the Portal — the new one then works for the app too. Click your <b>initials</b> → <b>Manage account</b> → <b>Password</b>. You'll need your current password, and the new one must have: <b>8+ characters, an uppercase letter, a lowercase letter, a number, a special character</b>, and differ from the old one.</p>
+   <p><b>Password Recovery Method</b> — set up Email, Mobile or an Authenticator app so a reset can reach you if it's ever forgotten (a verification code confirms it). The <b>Authenticator App</b> option shows 3 steps and a QR code to scan.</p>`},
+ {t:"Your witness PIN (Secondary Pin)", h:`
+   <p>The witness PIN lets you <b>witness on the tablet without typing your whole password</b> every time — it's only ever used for witnessing.</p>
+   <ol><li>Initials → <b>Manage account</b> → <b>Secondary Pin</b> (it says <i>Pending Setup</i> until done).</li>
+   <li>Type a PIN of <b>6–12 digits</b>, re-enter it, press <kbd class="app">Setup</kbd>.</li></ol>
+   <p>It can be reset any time with the same steps.</p>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(2)">💻 Practise setting your PIN</button></div>`}
+]},
+{ title:"Portal: checking in a medicine delivery", blurb:"The big weekly job — Verify, review the five tabs, Check-in.", steps:[
+ {t:"Where and what", h:`
+   <p><b>Medication ▾ → Check-Ins</b>. People with a number next to their name have items waiting. Click the person and the pharmacy's data appears with four tabs: <b>Dispensed Medications</b> (sent by pharmacy) · <b>Adhoc Medications</b> (created in the home) · <b>Checked-in Medications</b> · <b>Ignored/Rejected</b>.</p>
+   <p>Each row shows <b>Clashes If Any</b>, <b>Order Qty</b> and an editable <b>Dispensed Qty</b> — check it against the boxes in your hand. Then: <kbd class="app">Verify</kbd> to review, <b>Resolve</b> if there's a clash, <b>Reject</b> to send back for the pharmacy to correct and resend, or <b>Ignore</b> if it's genuinely not needed (ignored data can't be resent).</p>`},
+ {t:"The review screen — five tabs", h:`
+   <ul>
+    <li><b>Brand/Generic</b> — how it was dispensed vs how it was last checked in.</li>
+    <li><b>Medication</b> — name, new/existing, dosage instructions, quantity delivered.</li>
+    <li><b>Schedule</b> — the times sent by pharmacy; editable. A <b>Schedule Clash</b> shows the Current and New cycles side by side: <b>Continue Existing</b> keeps yours, <b>Change to New Schedule</b> starts the new one next cycle.</li>
+    <li><b>Settings</b> — the tickboxes that make it behave: <b>Long Term</b> (carries to every monthly cycle) · <b>Administration Managed</b> (appears on the app — untick for self-administering) · <b>Stock Counted</b> (untick creams/drops) · <b>Covert</b> · <b>High Risk</b> (witness, not quite a CD) · <b>PRN</b> · <b>Controlled Drug</b> (witness) · <b>Pain Level on eMAR</b> · <b>QR Code Enabled</b> — plus Medicated/Non-Medicated Topical and a follow-up interval.</li>
+    <li><b>Warnings</b> — ingredient/brand clashes (e.g. Laxido vs Macrogol — same ingredient, different brand): stop one, start the other, and sort the stock.</li>
+   </ul>
+   <p>Then <kbd class="app">Check-in</kbd> — a success pop-up confirms and it moves to the Checked-in tab.</p>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(3)">💻 Practise a full check-in + clash</button></div>`}
+]},
+{ title:"Portal: adding a medicine manually (Adhoc)", blurb:"Interims and new residents — when there's no pharmacy data.", steps:[
+ {t:"Add New Medicine", h:`
+   <ol><li>On the person's Check-Ins page, press <kbd class="app">Add New Medicine</kbd>.</li>
+   <li><b>Free-type the name</b> from the dispensing label until the right entry appears, and pick it.</li>
+   <li>Type the quantity into <b>Dispensed Qty</b>, then press <kbd class="app">Setup</kbd>.</li>
+   <li>The <b>Schedule Pattern</b> window opens: type the <b>Dosage Instructions</b> from the label, set Start and End dates, the Frequency, and each <b>Round time + Dosage</b> (Add Round / Add PRN for more). <kbd class="app">Save</kbd>.</li>
+   <li>Back on the check-in page — review and <kbd class="app">Check-in</kbd>. It's now live on the tablet.</li></ol>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(4)">💻 Practise adding a medicine</button></div>`}
+]},
+{ title:"Portal: editing & stopping schedules", blurb:"GP changes happen here — always with a note.", steps:[
+ {t:"Editing", h:`
+   <p>If a GP changes a dose or time, it can <b>only</b> be edited on the Portal: <b>Medication ▾ → Schedule</b> → pick the person → click the medicine → <kbd class="app">Edit Schedule</kbd>.</p>
+   <p>Fill in: <b>Dosage Instructions</b> (as the GP/label says) · <b>Notes — mandatory</b>, explaining why · Start/End dates (usually the cycle end) · Frequency &amp; Repeats · each <b>Round + Dosage</b>. It will not save without the note.</p>`},
+ {t:"Stopping — one or many", h:`
+   <ol><li>On the medicine's Schedule page, click <kbd class="app">⊘ Stop</kbd>.</li>
+   <li>Choose the stop date and time, type the <b>note</b> (why), and say where the stock goes: <b>Returned</b> to pharmacy or <b>Destroyed</b>.</li>
+   <li><kbd class="app">Amend Stock and Stop</kbd>.</li></ol>
+   <div class="tip"><b>💜 Stopping everything?</b> <b>Bulk actions → Stop Medications</b> lists all of them pre-ticked — untick any that continue, set the date, note, and Returned/Destroyed per item.</div>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(5)">💻 Practise an edit + a stop</button></div>`}
+]},
+{ title:"Portal: reorders, stock & audits", blurb:"The monthly order, moving stock, and keeping counts honest.", steps:[
+ {t:"The monthly order (Repeat Requests)", h:`
+   <ol><li><b>Medication ▾ → Repeat Requests</b> → pick the person.</li>
+   <li>Click <kbd class="app">New</kbd> next to each item needed (it flips to Remove, with a quantity box), then <kbd class="app">Save</kbd>.</li>
+   <li>The <b>Order Request</b> pop-up lists everything with a green tick when placed — failures show in <b style="color:#b91c1c">red</b> with the reason (e.g. a request already pending in the past 30 days).</li></ol>
+   <p><b>Next Cycle Order Report (PDF)</b> — per person (bottom-left) or for everyone (top-right): a printable list to cross-reference the delivery; some GPs accept it instead of paper repeat slips.</p>`},
+ {t:"Stock: moving, returning, auditing", h:`
+   <p><b>Medication ▾ → Stock</b> → pick the medicine. All its activity shows. Click <kbd class="app">Amend</kbd>:</p>
+   <ul><li>Boxes are <b>S</b> (shelf) and <b>T</b> (trolley), under <b>Other · Returned · Lost · Destroyed</b>.</li>
+   <li>Moving shelf → trolley: use <b>Other</b> with a <b>minus</b> on the shelf figure and the plus on the trolley.</li>
+   <li>The <b>note is mandatory</b> — every change appears on the Stock Report (your evidence for returns).</li></ul>
+   <p><b>Bulk actions → Amend Stock</b> opens every medicine at once (handy when everything is being returned). <b>Audit</b> records a stock check with a note — <b>Bulk Audit</b> does the whole list.</p>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(6)">💻 Practise an order + a stock move</button></div>`}
+]},
+{ title:"Portal: reports & MAR charts", blurb:"Everything printable — for handovers, audits and inspections.", steps:[
+ {t:"The Reports menu", h:`
+   <ul>
+    <li><b>MAR Chart</b> — pick the person and a from-date, <kbd class="app">Show Report</kbd>, then <kbd class="app">Print</kbd>. A <b>blank MAR chart</b> option exists for paper backup.</li>
+    <li><b>MAR Report</b> — filter by unit, person, staff member, role and dates; statuses <b>Taken · Missed · Skipped · Not-Managed</b>, plus Delayed and Scheduled/PRN. Notes made at administration appear on it.</li>
+    <li><b>PRN Report</b> — every PRN protocol in one table; flags any missing or due for review.</li>
+    <li><b>Stock Report</b> — all stock activity: check-ins, med actions, destroyed, lost, returned, adjustments, audits, and undone administrations.</li>
+    <li><b>Orders Report</b> — tracks the cycle's orders: quantity not matched, dates not matched, no check-in.</li>
+    <li><b>Service Users Chart</b> — a printable one-pager per person with their details and every active medicine (perfect when a healthcare professional visits).</li>
+   </ul>
+   <div class="launch"><button class="btn btn-primary" onclick="pSimStart(7)">💻 Practise printing a MAR chart</button></div>`}
+]},
+{ title:"Portal: admin — people, absences & med set-up", blurb:"Usually the manager's corner — good to recognise.", part2note:1, steps:[
+ {t:"People: adding, absence, leaving", h:`
+   <p><b>Admin → Service Users → Add New Service User</b>: fill the starred fields — and the <b>NHS Number MUST be correct</b>, or the pharmacy's data can't land and everything becomes manual. A photo can be uploaded from a file or taken with <b>Take Screenshot</b>; Save the photo, then Save the page.</p>
+   <p><b>Absence</b> (hospital/leave): the person's <b>Absence tab → Add Absence</b> — start date, start time and reason are mandatory, and always add a note (it shows on the app and dashboard). Add the end date when they're back — a pop-up reminds you to check the stock. If someone leaves or passes away, mark <b>Inactive</b> or <b>Deceased</b>, and manage the stock through Returned/Destroyed after the required time.</p>`},
+ {t:"Per-medicine set-up (what makes the app behave)", h:`
+   <ul>
+    <li><b>Details tab</b> — the same property tickboxes as check-in, editable later; plus <b>Round Duration</b> for time-specific medicines (minutes after the round before it flags as missed) and Low Stock Alerts.</li>
+    <li><b>PRN Protocols tab</b> — the person-centred rules: max-admin warning, max in 24 hrs, minimum interval, action if no effect, time expected for effect, triggers, reason, side effects, route, actions to take first — with <b>Add Review</b> and a next-review date. Shows on the app under the medicine's info.</li>
+    <li><b>Body map tab</b> — enable, then choose <b>Location Map</b> (fixed spots), <b>Cyclic Location Map</b> (rotation with a recovery time in days/hours — for patches and injections), or <b>Full Body Map</b>; allow adhoc locations or make them mandatory. (Cyclic and Full Body need the Camascope 2.0 app.)</li>
+    <li><b>Vitals tab</b> — <b>Enable Vitals</b>, tick Pain, Blood Pressure, Heart Rate or Blood Glucose, and type the instructions carers will see (e.g. <i>“If pulse below 60bpm do not administer”</i>). Save!</li>
+   </ul>
+   <div class="note"><b>ℹ Why no practice task?</b> These are set-up jobs, usually a manager's. The <i>results</i> of them — the vitals check, the body map, the PRN protocol — are all in your Part 1 tablet practice.</div>`}
+]}
+];
+PORTAL_MODULES.forEach(function(m){m.part=2;MODULES.push(m)});
+
+/* ================= quiz ================= */
+const QUIZ=[
+ {q:"Which icon do you tap on the tablet to open the app?",o:["Classic Camascope","Camascope 2.0 (the purple one)","Either — they're the same","Settings"],a:1,e:"Always Camascope 2.0 — Classic is the old version."},
+ {q:"On the main grid, a green tick means…",o:["Medicine due now","Medicine skipped","Medicine given and signed for","Medicine out of stock"],a:2,e:"Green tick = administered and signed."},
+ {q:"An orange clock symbol means…",o:["Due in the current time frame","Given late","Skipped","Scheduled for tomorrow"],a:0,e:"Orange clock = it's due now — your job this round."},
+ {q:"A red triangle-in-a-circle means…",o:["Controlled drug","Missed — nothing was recorded","PRN","Person is absent"],a:1,e:"Red = missing signature. Skipping with a reason avoids this."},
+ {q:"Before you can sign for a controlled drug (CD), you must…",o:["Ring the pharmacy","Take a photo","Add a witness who enters their own PIN","Tick a box"],a:2,e:"CDs need a second person: Add Witness → their username + PIN."},
+ {q:"What must you do before the Take button unlocks on a PRN?",o:["Nothing — tap Take","Type a note saying why the person needs it","Add a witness","Restart the app"],a:1,e:"The why-note is compulsory for every PRN."},
+ {q:"Desdemona refuses her evening tablet. You should…",o:["Leave it and move on","Mark it Taken anyway","Tap Skip, choose 'Refused', and write a note","Give it later without recording"],a:2,e:"Skip + reason + note — never leave it unsigned, never sign what wasn't given."},
+ {q:"What should you always check on the person's panel before giving anything?",o:["Their room number only","Photo, allergies and notes","The weather","The battery level"],a:1,e:"Photo (right person!), allergies, and their notes."},
+ {q:"The wifi symbol turns orange and says 'offline'. Can you carry on?",o:["No — stop the round","Yes — the app works offline for up to 24 hours","Only for PRNs","Only with a witness"],a:1,e:"Keep going; it syncs when the connection returns."},
+ {q:"You've finished your medicines. Before handing the tablet over, you…",o:["Turn the screen off","Tap ☰ then Logout","Delete the app","Nothing"],a:1,e:"Always log out — records are signed in the name shown top-right."},
+ {q:"A pharmacy delivery has arrived. Where is it checked in?",o:["On the tablet app","Portal → Medication → Check-Ins","Ring the pharmacy","Reports → Stock"],a:1,e:"Check-Ins on the Portal: Verify each item, review the five tabs, then Check-in."},
+ {q:"What will the Portal refuse to save a schedule change without?",o:["A witness","A photo","A note explaining why","A manager's password"],a:2,e:"Every schedule edit, stop and stock change needs a note — that's the audit trail."},
+ {q:"Where is your witness PIN set up?",o:["On the tablet","Portal → your initials → Manage account → Secondary Pin","It's posted to you","In the drug cupboard"],a:1,e:"Secondary Pin: 6–12 digits, only ever used for witnessing."},
+ {q:"Stopping a medicine asks where the stock goes. The choices are…",o:["Bin or shelf","Returned or Destroyed","Trolley or fridge","There's no choice"],a:1,e:"Returned to pharmacy or Destroyed — recorded on the Stock Report as evidence."}
+];
+
+/* ================= app state / views ================= */
+const done=new Set(); let cm=0,cs=0,view="home",qi=0,qScore=0,qLocked=false;
+const app=document.getElementById("app");
+function goHome(){view="home";render();window.scrollTo(0,0)}
+function openModule(i){view="module";cm=i;cs=0;render();window.scrollTo(0,0)}
+function openQuiz(){view="quiz";qi=0;qScore=0;qLocked=false;render();window.scrollTo(0,0)}
+function openCheat(){view="cheat";render();window.scrollTo(0,0)}
+function render(){
+ if(view==="home")return renderHome();
+ if(view==="module")return renderModule();
+ if(view==="quiz")return renderQuiz();
+ if(view==="cheat")return renderCheat();
+ if(view==="sim")return renderSim();
+ if(view==="psim")return renderPSim();
+}
+function firstUnfinished(){for(let i=0;i<MODULES.length;i++)if(!done.has(i))return i;return 0}
+function renderHome(){
+ const cards=MODULES.map((m,i)=>`
+  ${m.part===2&&(!MODULES[i-1]||MODULES[i-1].part!==2)?`<h2 class="parthead">Part 2 — the office Portal 💻</h2>`:""}<button class="mcard ${done.has(i)?"done":""}" onclick="openModule(${i})">
+   <span class="mnum">${done.has(i)?"✓":i+1}</span>
+   <span class="mtxt"><h3>${m.title}</h3><p>${m.blurb}</p></span>
+   <span class="mgo">›</span></button>`).join("");
+ app.innerHTML=`
+  <section class="hero">
+   <h1>Learn <span>Camascope&nbsp;2.0</span>,<br>one gentle step at a time</h1>
+   <p>Made just for you 💜 — short reading sections, plus a <b>practice tablet</b> and a <b>practice Portal</b> that look and work like the real software — the app on your round, and the office website behind it. It all works on a phone, a tablet or a computer, and nothing here touches real records.</p>
+  </section>
+  <div class="featcard">
+   <h2>📱 Part 1 practice — the tablet app</h2>
+   <p>A working copy of the Camascope 2.0 screens, laid out like the real forms — and <b>you type everything yourself</b>: doses, notes, the witness PIN, blood-pressure readings, skip reasons. Your coach 👩‍🏫 guides every step, and what you type is recorded on the entries, just like the real app. <b>Every screen from the 31-page guide is in here.</b> Do the whole round, or jump to one task:</p>
+   <div class="taskchips">${TASKS.map((t,i)=>`<button class="tchip ${simDone.has(i)?"done":""}" onclick="simStart(${i})">${simDone.has(i)?"✓ ":""}${i+1}. ${t[0]}</button>`).join("")}</div>
+   <button class="btn btn-primary" onclick="simStart(0)">▶ Start the full round</button>
+  </div>
+  <div class="featcard" style="margin-top:.8rem">
+   <h2>💻 Part 2 practice — the office Portal</h2>
+   <p>The website side (<b>emar.vcaresystems.co.uk</b>) where deliveries are checked in, medicines are added, schedules change, orders go out and MAR charts print — again, <b>you type everything yourself</b>.</p>
+   <div class="taskchips">${PTASKS.map((t,i)=>`<button class="tchip ${pDone.has(i)?"done":""}" onclick="pSimStart(${i})">${pDone.has(i)?"✓ ":""}${i+1}. ${t[0]}</button>`).join("")}</div>
+   <button class="btn btn-primary" onclick="pSimStart(0)">▶ Start the Portal round</button>
+  </div>
+  <div class="pathlist"><h2 class="parthead" style="margin-top:.2rem">Part 1 — the tablet app 📱</h2>${cards}</div>
+  <div class="home-extra">
+   <button class="btn ${done.size>=MODULES.length?"btn-primary":"btn-ghost"}" onclick="openQuiz()">🎓 Final knowledge check</button>
+   <button class="btn btn-ghost" onclick="openCheat()">📄 One-page cheat sheet</button>
+  </div>
+  ${done.size?`<p style="margin-top:1rem;color:var(--ink-soft)">Reading progress: <b>${done.size} of ${MODULES.length}</b> sections ${done.size>=MODULES.length?"— all done, superstar! 🎉":""}</p>`:""}`;
+}
+function renderModule(){
+ const m=MODULES[cm],s=m.steps[cs],last=cs===m.steps.length-1;
+ app.innerHTML=`
+  <div class="crumb"><button class="back" onclick="goHome()">‹ All sections</button><span class="where">Section ${cm+1} · ${m.title}</span></div>
+  <div class="stepmeta">Step ${cs+1} of ${m.steps.length}</div>
+  <div class="stepbar"><i style="width:${((cs+1)/m.steps.length)*100}%"></i></div>
+  <div class="stepcard"><h2>${s.t}</h2>${s.h}
+   <div class="navrow no-print">
+    <button class="btn btn-ghost" ${cs===0?"disabled":""} onclick="prevStep()">‹ Back</button>
+    <button class="btn btn-primary" onclick="nextStep()">${last?"Finish this section ✓":"Next ›"}</button>
+   </div></div>`;
+ if(s.init==="game")initGame();
+}
+function nextStep(){const m=MODULES[cm];
+ if(cs<m.steps.length-1){cs++;renderModule();window.scrollTo(0,0)}
+ else{done.add(cm);toast("✓ “"+m.title+"” finished — lovely work!");
+  if(cm<MODULES.length-1){cm++;cs=0;renderModule();window.scrollTo(0,0)}else goHome()}}
+function prevStep(){if(cs>0){cs--;renderModule();window.scrollTo(0,0)}}
+
+/* symbol game */
+const GAME=[
+ {ask:"Tap the symbol that means the medicine is due right now.",key:"due"},
+ {ask:"Tap the symbol for a medicine already given and signed.",key:"taken"},
+ {ask:"Tap the symbol that means missed — nothing recorded.",key:"missed"},
+ {ask:"Tap the symbol for a skipped medicine (with a reason).",key:"skip"},
+ {ask:"Tap the symbol for scheduled — but not due yet.",key:"sched"},
+ {ask:"Tap the symbol for “when required” medicines.",key:"prn"}];
+let gi=0;
+function initGame(){gi=0;
+ const keys=["taken","due","sched","skip","missed","prn"].sort(()=>Math.random()-.5);
+ document.getElementById("grow").innerHTML=keys.map(k=>`<button class="gbtn" data-k="${k}" onclick="gamePick(this)" aria-label="${k}">${IC[k](44)}</button>`).join("");
+ gameAsk()}
+function gameAsk(){const q=document.getElementById("gq");if(!q)return;
+ if(gi<GAME.length){q.textContent=(gi+1)+" of "+GAME.length+" — "+GAME[gi].ask;
+  const f=document.getElementById("gfb");f.textContent="";f.className="game-fb"}
+ else{q.textContent="🎉 All six — you know your symbols!";
+  const f=document.getElementById("gfb");f.className="game-fb good";f.textContent="That grid will make sense at a glance now."}}
+function gamePick(btn){if(gi>=GAME.length)return;
+ const fb=document.getElementById("gfb");
+ document.querySelectorAll(".gbtn").forEach(b=>b.classList.remove("right","wrong"));
+ if(btn.dataset.k===GAME[gi].key){btn.classList.add("right");fb.className="game-fb good";fb.textContent="✓ Spot on!";gi++;setTimeout(gameAsk,750)}
+ else{btn.classList.add("wrong");fb.className="game-fb bad";fb.textContent="Not that one — try again."}}
+
+/* quiz */
+function renderQuiz(){
+ if(qi>=QUIZ.length){const great=qScore>=8;
+  app.innerHTML=`<div class="crumb"><button class="back" onclick="goHome()">‹ All sections</button><span class="where">Knowledge check</span></div>
+  <div class="stepcard" style="text-align:center"><h2>Your score</h2>
+   <div class="scorebig">${qScore} / ${QUIZ.length}</div>
+   <p style="margin-top:.5rem">${great?"Brilliant — you're ready for the real thing. 🎉":"Good effort! Have another read of the tricky sections, then try again — you'll smash it."}</p>
+   <div class="navrow" style="justify-content:center">
+    <button class="btn btn-ghost" onclick="openQuiz()">↺ Try again</button>
+    <button class="btn btn-primary" onclick="openCheat()">📄 See the cheat sheet</button>
+   </div></div>`;return}
+ const q=QUIZ[qi];
+ app.innerHTML=`
+  <div class="crumb"><button class="back" onclick="goHome()">‹ All sections</button><span class="where">Knowledge check</span></div>
+  <div class="stepmeta">Question ${qi+1} of ${QUIZ.length} · Score ${qScore}</div>
+  <div class="stepbar"><i style="width:${(qi/QUIZ.length)*100}%"></i></div>
+  <div class="stepcard"><h2>${q.q}</h2>
+   ${q.o.map((o,i)=>`<button class="qopt" id="q${i}" onclick="quizAnswer(${i})">${o}</button>`).join("")}
+   <div class="qexp" id="qexp"></div>
+   <div class="navrow"><span></span><button class="btn btn-primary" id="qnext" style="display:none" onclick="quizNext()">Next ›</button></div></div>`;
+ qLocked=false}
+function quizAnswer(i){if(qLocked)return;qLocked=true;const q=QUIZ[qi];
+ document.getElementById("q"+q.a).classList.add("correct");
+ if(i===q.a)qScore++;else document.getElementById("q"+i).classList.add("incorrect");
+ document.getElementById("qexp").innerHTML=(i===q.a?"<b style='color:var(--green)'>✓ Correct.</b> ":"<b style='color:var(--red)'>Not quite.</b> ")+q.e;
+ const n=document.getElementById("qnext");n.style.display="inline-flex";
+ n.textContent=(qi===QUIZ.length-1)?"See my score ›":"Next ›"}
+function quizNext(){qi++;renderQuiz();window.scrollTo(0,0)}
+
+/* cheat sheet */
+function renderCheat(){
+ app.innerHTML=`
+ <div class="crumb no-print"><button class="back" onclick="goHome()">‹ All sections</button><span class="where">Cheat sheet</span></div>
+ <div class="cheat"><h2>Camascope 2.0 — quick reference</h2>
+ <p style="color:var(--ink-soft)">Print this and keep it by the trolley. <button class="btn btn-ghost no-print" style="padding:.4rem .9rem;font-size:.95rem" onclick="window.print()">🖨 Print</button></p>
+ <div class="cheatgrid">
+  <div class="cheatbox"><h3>Logging in</h3><ol>
+   <li>Tap <b>Camascope 2.0</b> (purple icon)</li><li>Login → username → Sign In → password → Sign In</li>
+   <li>Select care home → select ward → Continue</li></ol></div>
+  <div class="cheatbox"><h3>The symbols</h3>
+   <div class="symline"><span class="ic">${IC.taken(30)}</span>Given &amp; signed</div>
+   <div class="symline"><span class="ic">${IC.due(30)}</span>Due now</div>
+   <div class="symline"><span class="ic">${IC.sched(30)}</span>Scheduled, not due yet</div>
+   <div class="symline"><span class="ic">${IC.skip(30)}</span>Skipped (with reason)</div>
+   <div class="symline"><span class="ic">${IC.missed(30)}</span>Missed — needs attention</div>
+   <div class="symline"><span class="ic">${IC.prn(30)}</span>PRN — when required</div></div>
+  <div class="cheatbox"><h3>Giving a medicine</h3><ol>
+   <li>Tap person's symbol in current round</li><li>Check <b>photo · allergies · notes</b></li>
+   <li>Tap medicine → check dose &amp; route</li><li>Give it → tap <b>Take</b> (turns green)</li>
+   <li>Or <b>Take All</b> → prepare each → Submit</li></ol></div>
+  <div class="cheatbox"><h3>Controlled drugs (CD)</h3><ol>
+   <li>Take is grey until witness added</li><li><b>Add Witness</b> → their username + their PIN → Login</li>
+   <li>“Witnessed by…” shows → tap <b>Take</b></li></ol></div>
+  <div class="cheatbox"><h3>PRN (when required)</h3><ol>
+   <li><b>More Info</b> = protocol: max in 24h, minimum gap, if no effect</li><li>Check “Last taken”</li>
+   <li><b>Note is compulsory</b> — why they need it (🎤 works)</li>
+   <li>Follow-up flag ⚑ later → tap it, record outcome</li></ol></div>
+  <div class="cheatbox"><h3>Not taken? Skip it</h3><ol>
+   <li>Tap medicine → <b>Skip</b></li><li>Reduce stock (if dose wasted)</li>
+   <li>Reason: Refused / Sleeping / Nausea / Hospitalised…</li>
+   <li>Note (compulsory) → <b>Skip</b> (turns orange)</li></ol>
+   <p style="font-size:.88rem;margin-top:.3rem">Never leave a medicine unsigned — that shows as red “missed”.</p></div>
+  <div class="cheatbox"><h3>Vitals &amp; body maps</h3><ul>
+   <li>Vitals icon → record reading + position → read instructions → Continue</li>
+   <li>Creams/patches → tap body location (follow “Suggested”) → Continue</li></ul></div>
+  <div class="cheatbox"><h3>Finishing up</h3><ul>
+   <li>Wifi orange/offline? Keep going — works 24h offline</li>
+   <li><b>Always log out:</b> ☰ → Logout</li>
+   <li>Support: ☎ 020 8638 7291 · support@camascope.com</li></ul></div>
+  <div class="cheatbox"><h3>Portal basics</h3><ul>
+   <li>emar.vcaresystems.co.uk — same login as the app</li>
+   <li>Choose <b>Another User</b> · Sign out via your initials</li>
+   <li>Witness PIN: initials → Manage account → Secondary Pin (6–12 digits)</li>
+   <li>Passwords change on the Portal only</li></ul></div>
+  <div class="cheatbox"><h3>Portal: check-ins</h3><ol>
+   <li>Medication → <b>Check-Ins</b> → person with a number</li>
+   <li>Check <b>Dispensed Qty</b> against the boxes → <b>Verify</b></li>
+   <li>Review tabs: Brand/Generic · Medication · Schedule · <b>Settings</b> (Long Term!) · Warnings → <b>Check-in</b></li>
+   <li>Clash? <b>Resolve</b> → Continue Existing or Change to New</li>
+   <li>No pharmacy data? <b>Add New Medicine</b> → qty → Setup schedule</li></ol></div>
+  <div class="cheatbox"><h3>Portal: schedules · orders · stock · reports</h3><ul>
+   <li>Edit/Stop schedules: Medication → Schedule — <b>note always mandatory</b>; stopped stock = Returned or Destroyed</li>
+   <li>Monthly order: Repeat Requests → <b>New</b> → Save (red = failed + reason)</li>
+   <li>Stock moves: Stock → Amend (−S / +T) + note · Audit for checks</li>
+   <li>Reports → <b>MAR Chart</b> → person → Show Report → Print</li></ul></div>
+ </div></div>`}
+
+goHome();
+</script>
+</body>
+</html>
