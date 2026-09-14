@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camascope Portal — Adding a Medicine Manually (Adhoc)</title>
+<style>
+:root{
+  --navy:#0A1B3D;
+  --purple:#6B2C91;
+  --purple-dark:#55206F;
+  --purple-soft:#F3EAF8;
+  --orange:#E8820C;
+  --green:#1E8E4A;
+  --red:#C62828;
+  --ink:#1D1F27;
+  --grey:#5A6072;
+  --line:#D9DCE3;
+  --page:#EEF0F5;
+  --white:#fff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:Roboto,"Helvetica Neue",Helvetica,Arial,"Segoe UI",sans-serif;
+  background:var(--page);
+  color:var(--ink);
+  font-size:18.5px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 14px 60px;}
+
+/* ---------- page head ---------- */
+.pagehead{padding:22px 4px 10px;}
+.pagehead h1{font-size:27px;margin:0 0 6px;font-weight:700;letter-spacing:-0.2px;}
+.pagehead p{margin:0;color:var(--grey);font-size:17px;max-width:60ch;}
+.pagehead a{color:var(--purple);}
+
+/* ---------- coach bar ---------- */
+.coach{
+  background:var(--white);
+  border:2px solid var(--purple);
+  border-radius:10px;
+  padding:16px 18px;
+  margin:16px 0 18px;
+  position:sticky;top:0;z-index:40;
+  box-shadow:0 4px 14px rgba(10,27,61,.10);
+}
+.coach .task{font-size:15px;color:var(--purple);font-weight:700;margin-bottom:4px;}
+.coach .instruction{font-size:19px;font-weight:500;}
+.coach .detail{font-size:16.5px;color:var(--grey);margin-top:6px;}
+.coach .detail b{color:var(--ink);}
+.alert{
+  margin-top:10px;background:#FDECEC;border-left:5px solid var(--red);
+  color:#8E1B1B;padding:10px 12px;border-radius:4px;font-size:16.5px;display:none;
+}
+.alert.show{display:block;}
+.done-note{
+  margin-top:10px;background:#E8F5EC;border-left:5px solid var(--green);
+  color:#145C31;padding:10px 12px;border-radius:4px;font-size:16.5px;display:none;
+}
+.done-note.show{display:block;}
+
+/* ---------- portal chrome ---------- */
+.portal{background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.topbar{
+  background:var(--navy);color:#fff;display:flex;align-items:center;gap:22px;
+  padding:12px 16px;font-size:16px;flex-wrap:wrap;
+}
+.logo{font-weight:300;font-size:21px;letter-spacing:-.3px;}
+.logo b{font-weight:700;}
+.logo .dot{color:#C04BC9;}
+.topbar nav{display:flex;gap:18px;color:#DDE2EC;flex-wrap:wrap;font-size:15.5px;}
+.topbar .avatar{
+  margin-left:auto;background:var(--purple);border-radius:50%;
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;
+}
+
+.portal-body{display:flex;min-height:520px;}
+.userlist{width:250px;border-right:1px solid var(--line);flex-shrink:0;background:#FBFBFD;}
+.userlist h3{
+  font-size:16px;margin:0;padding:14px 14px 10px;font-weight:700;border-bottom:1px solid var(--line);
+}
+.user{
+  padding:12px 14px;border-bottom:1px solid #ECEEF3;cursor:pointer;display:flex;gap:10px;align-items:center;
+}
+.user:hover{background:#F2ECF7;}
+.user.active{background:var(--purple-soft);box-shadow:inset 4px 0 0 var(--purple);}
+.user .ini{
+  width:36px;height:36px;border-radius:50%;background:#8E5BAE;color:#fff;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:700;
+}
+.user .nm{font-size:16px;font-weight:600;line-height:1.25;}
+.user .dob{font-size:13.5px;color:var(--grey);}
+.user .count{
+  margin-left:auto;background:#fff;border:1px solid var(--line);border-radius:50%;
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+
+.main{flex:1;min-width:0;padding:16px 18px 26px;}
+.resident{
+  display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;
+  padding:10px 12px;margin-bottom:14px;
+}
+.resident .ini{width:40px;height:40px;border-radius:50%;background:var(--purple);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+.resident .who{font-weight:700;font-size:17.5px;}
+.resident .meta{font-size:14.5px;color:var(--grey);}
+.pill{display:inline-block;font-size:12.5px;padding:2px 8px;border-radius:4px;margin-left:6px;vertical-align:middle;}
+.pill.allergy{background:var(--orange);color:#fff;}
+.pill.notes{background:#2F6FB5;color:#fff;}
+
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:14px;flex-wrap:wrap;}
+.tab{
+  padding:9px 14px;font-size:16px;color:var(--grey);cursor:default;border-radius:6px 6px 0 0;
+}
+.tab.on{background:var(--purple-soft);color:var(--purple);font-weight:700;box-shadow:inset 0 -3px 0 var(--purple);}
+
+.rowhead{
+  display:flex;font-size:14.5px;color:var(--grey);font-weight:700;padding:0 4px 8px;border-bottom:1px solid var(--line);
+}
+.rowhead span:nth-child(1){flex:1;}
+.rowhead span:nth-child(2){width:120px;text-align:center;}
+.rowhead span:nth-child(3){width:150px;text-align:center;}
+.rowhead span:nth-child(4){width:170px;}
+
+.medrow{display:flex;align-items:center;padding:14px 4px;border-bottom:1px solid #EDEFF4;gap:8px;flex-wrap:wrap;}
+.medrow .name{flex:1;min-width:190px;}
+.medrow .name .n{font-weight:600;font-size:17px;}
+.medrow .name .d{font-size:15px;color:var(--grey);}
+.medrow .oq{width:120px;text-align:center;color:var(--grey);}
+.medrow .dq{width:150px;text-align:center;}
+.medrow .act{width:170px;display:flex;gap:10px;align-items:center;}
+.tagnew{color:#2F6FB5;font-size:13.5px;font-weight:700;}
+
+input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{
+  font-family:inherit;font-size:17px;padding:9px 10px;border:1px solid #B9BEC9;border-radius:5px;
+  width:100%;background:#fff;color:var(--ink);
+}
+input:focus,select:focus,textarea:focus{outline:3px solid #C9A6DD;outline-offset:1px;border-color:var(--purple);}
+.qty{width:100px;text-align:center;}
+
+.btn{
+  font-family:inherit;font-size:16px;font-weight:600;border-radius:20px;padding:9px 20px;
+  border:1px solid var(--purple);background:var(--purple);color:#fff;cursor:pointer;
+}
+.btn:hover{background:var(--purple-dark);}
+.btn.ghost{background:#fff;color:var(--purple);}
+.btn.ghost:hover{background:var(--purple-soft);}
+.btn.plain{border-color:#B9BEC9;background:#fff;color:var(--grey);}
+.btn.sq{border-radius:6px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.linkbtn{background:none;border:none;color:var(--grey);font-family:inherit;font-size:15.5px;cursor:pointer;text-decoration:underline;}
+
+.addbar{display:flex;justify-content:flex-end;margin-bottom:12px;}
+
+/* search dropdown */
+.searchwrap{position:relative;margin:10px 0 4px;max-width:560px;}
+.results{
+  position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--line);
+  border-radius:0 0 6px 6px;box-shadow:0 8px 20px rgba(10,27,61,.16);z-index:30;max-height:230px;overflow:auto;
+}
+.results div{padding:11px 12px;font-size:16.5px;cursor:pointer;border-bottom:1px solid #F0F1F5;}
+.results div:hover,.results div.hl{background:var(--purple);color:#fff;}
+.hint{font-size:15px;color:var(--grey);margin:4px 0 0;}
+
+/* info bar */
+.infobar{
+  background:#EAF2FB;border:1px solid #BBD5EF;color:#1B456F;border-radius:6px;
+  padding:11px 13px;font-size:16px;margin-bottom:14px;
+}
+
+/* schedule modal */
+.modalback{
+  position:fixed;inset:0;background:rgba(12,20,38,.55);display:none;z-index:60;
+  padding:18px;overflow:auto;
+}
+.modalback.show{display:block;}
+.modal{
+  background:#fff;border-radius:10px;max-width:620px;margin:20px auto;padding:20px 20px 22px;
+}
+.modal h3{margin:0 0 4px;font-size:21px;}
+.modal .sub{color:var(--grey);font-size:15.5px;margin:0 0 16px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:15.5px;color:var(--grey);margin-bottom:5px;font-weight:600;}
+.field label .star{color:var(--red);}
+.two{display:flex;gap:12px;flex-wrap:wrap;}
+.two>div{flex:1;min-width:150px;}
+.freq{display:flex;gap:16px;flex-wrap:wrap;font-size:16.5px;}
+.freq label{display:flex;gap:6px;align-items:center;}
+.roundrow{display:flex;gap:10px;align-items:center;margin-bottom:9px;}
+.roundrow .rtime{width:130px;}
+.roundrow .rdose{width:110px;}
+.roundrow .prn{font-size:14px;background:var(--orange);color:#fff;border-radius:4px;padding:2px 7px;}
+.xbtn{background:none;border:none;font-size:20px;color:var(--grey);cursor:pointer;line-height:1;}
+.modal-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:18px;}
+
+/* calendar */
+.cal{border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:14px;}
+.caltop{background:#F7F7FA;padding:8px 12px;font-size:15.5px;border-bottom:1px solid var(--line);text-align:center;}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);}
+.calgrid .dow{background:#FAFAFC;font-size:13px;color:var(--grey);text-align:center;padding:6px 0;border-bottom:1px solid var(--line);}
+.calgrid .day{min-height:62px;border:1px solid #EDEFF4;padding:4px;font-size:12.5px;color:#9AA0AE;}
+.calgrid .day.on{background:#E7F0FB;color:#1B456F;}
+.calgrid .day .t{display:block;font-size:12.5px;color:#22406B;}
+
+/* success */
+.toast{
+  position:fixed;right:18px;top:18px;background:#fff;border:1px solid var(--line);border-left:6px solid var(--green);
+  border-radius:8px;padding:14px 16px;box-shadow:0 10px 26px rgba(10,27,61,.2);z-index:70;max-width:340px;display:none;
+}
+.toast.show{display:block;}
+.toast h4{margin:0 0 6px;font-size:17px;}
+.toast p{margin:0 0 10px;font-size:16px;color:var(--grey);}
+
+/* finished panel */
+.finish{background:#fff;border:2px solid var(--green);border-radius:10px;padding:22px;margin-top:18px;display:none;}
+.finish.show{display:block;}
+.finish h2{margin:0 0 8px;font-size:22px;color:#145C31;}
+.finish ul{margin:10px 0 16px;padding-left:22px;font-size:17px;}
+
+.foot{margin-top:26px;font-size:16px;color:var(--grey);text-align:center;}
+.foot a{color:var(--purple);}
+
+@media (max-width:820px){
+  body{font-size:18px;}
+  .portal-body{display:block;}
+  .userlist{width:auto;border-right:none;border-bottom:1px solid var(--line);max-height:270px;overflow:auto;}
+  .main{padding:14px;}
+  .rowhead{display:none;}
+  .medrow{display:block;}
+  .medrow .oq{display:none;}
+  .medrow .dq{width:auto;text-align:left;margin:10px 0;}
+  .medrow .act{width:auto;margin-top:6px;}
+  .qty{width:130px;}
+  .coach{position:static;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="pagehead">
+    <h1>Adding a medicine by hand (Adhoc)</h1>
+    <p>For when the pharmacy hasn't sent the medicine over — an interim script, or a new resident arriving with their own medication. You'll do the whole thing three times, with a different resident and medicine each time. Nothing here is real, so tap anything.</p>
+  </div>
+
+  <div class="coach" id="coach">
+    <div class="task" id="taskLabel">Practice 1 of 3</div>
+    <div class="instruction" id="instruction">Loading…</div>
+    <div class="detail" id="detail"></div>
+    <div class="alert" id="alert"></div>
+    <div class="done-note" id="doneNote"></div>
+  </div>
+
+  <div class="portal">
+    <div class="topbar">
+      <span class="logo"><span class="dot">◍</span> Cama<b>scope</b></span>
+      <nav><span>Dashboard</span><span>Medication</span><span>Reports</span><span>Admin</span></nav>
+      <span class="avatar">MM</span>
+    </div>
+
+    <div class="portal-body">
+      <div class="userlist" id="userlist">
+        <h3>Service Users (6)</h3>
+      </div>
+
+      <div class="main">
+        <div id="screenCheckin">
+          <div class="resident" id="residentCard">
+            <div class="ini" id="rIni">--</div>
+            <div>
+              <div class="who" id="rName">Select a service user on the left</div>
+              <div class="meta" id="rMeta"></div>
+            </div>
+          </div>
+
+          <div class="tabs">
+            <div class="tab" id="tabDisp">Dispensed Medications</div>
+            <div class="tab on" id="tabAdhoc">Adhoc Medications</div>
+            <div class="tab">Checked-in Medications</div>
+            <div class="tab">Ignored / Rejected</div>
+          </div>
+
+          <div class="addbar">
+            <button class="btn ghost" id="addNewBtn">Add New Medicine</button>
+          </div>
+
+          <div id="adhocArea"></div>
+        </div>
+
+        <div id="screenSetup" style="display:none">
+          <div class="resident">
+            <div class="ini" id="sIni">--</div>
+            <div>
+              <div class="who" id="sName"></div>
+              <div class="meta" id="sMeta"></div>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:12px;">
+            <span class="tagnew">NEW</span>
+            <span style="background:var(--orange);color:#fff;border-radius:4px;padding:2px 8px;font-size:13px;margin-left:6px;">Pending Setup</span>
+            <div style="font-size:19px;font-weight:600;margin-top:6px;" id="sMedName"></div>
+            <div style="font-size:15.5px;color:var(--grey);" id="sMedQty"></div>
+          </div>
+
+          <div class="tabs">
+            <div class="tab">Brand / Generic</div>
+            <div class="tab">Medication</div>
+            <div class="tab on">Schedule</div>
+            <div class="tab">Settings</div>
+            <div class="tab">Warnings</div>
+          </div>
+
+          <div class="infobar">The Pharmacy has dispensed the medication but has not shared the schedule. You can set up the schedule by clicking on the Add new schedule button.</div>
+
+          <div id="scheduleArea">
+            <button class="btn sq" id="addSchedBtn">Add new schedule</button>
+          </div>
+
+          <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn ghost sq" id="backBtn">Back to check-in</button>
+            <button class="btn sq" id="checkInBtn" disabled>Check in</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="finish" id="finish">
+    <h2>That's all three done</h2>
+    <p>You've now added a medicine by hand from start to finish — search, quantity, setup, schedule, check in.</p>
+    <ul>
+      <li>Adhoc means <b>you</b> are creating the data, so the schedule never arrives ready-made — you always build it yourself before you can check in.</li>
+      <li>The dosage instructions must match the dispensing label on the box, word for word.</li>
+      <li>Round time is the time it's actually given. One round per time of day, or press Add PRN for a when-required medicine.</li>
+      <li>If you pick the wrong medicine in the search, press Remove and start that one again — it's easier than fixing it later.</li>
+    </ul>
+    <button class="btn sq" id="againBtn">Practise all three again</button>
+  </div>
+
+  <div class="foot">
+    Stuck? Camascope Support: ☎ 020 8638 7291 · ✉ support@camascope.com<br>
+    <a href="https://alanc121.github.io/camascope-training/">← Back to the main training</a>
+  </div>
+</div>
+
+<!-- schedule modal -->
+<div class="modalback" id="modalBack">
+  <div class="modal">
+    <h3>Schedule Pattern</h3>
+    <p class="sub">All fields marked with <span style="color:var(--red)">*</span> are mandatory.</p>
+
+    <div class="field">
+      <label>Dosage Instructions <span class="star">*</span></label>
+      <input type="text" id="fDosage" placeholder="Copy the instruction from the dispensing label">
+    </div>
+
+    <div class="two">
+      <div class="field">
+        <label>Start Date <span class="star">*</span></label>
+        <input type="date" id="fStart">
+      </div>
+      <div class="field">
+        <label>End Date <span class="star">*</span></label>
+        <input type="date" id="fEnd">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Frequency</label>
+      <div class="freq">
+        <label><input type="radio" name="freq" value="Daily" checked> Daily</label>
+        <label><input type="radio" name="freq" value="Weekly"> Weekly</label>
+        <label><input type="radio" name="freq" value="Monthly"> Monthly</label>
+        <label><input type="radio" name="freq" value="Custom"> Custom</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Repeats every</label>
+      <div class="two">
+        <div><input type="number" id="fRepeat" value="1" min="1"></div>
+        <div><input type="text" value="Day(s)" readonly style="background:#F4F5F8;color:var(--grey)"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Round and Dosage <span class="star">*</span></label>
+      <div id="roundsBox"></div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn ghost sq" id="addRoundBtn" type="button">Add Round</button>
+        <button class="btn ghost sq" id="addPrnBtn" type="button">Add PRN</button>
+      </div>
+    </div>
+
+    <div class="alert" id="modalAlert"></div>
+
+    <div class="modal-actions">
+      <button class="linkbtn" id="cancelSched" type="button">Cancel</button>
+      <button class="btn sq" id="saveSched" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <h4 id="toastTitle">Checkin Status - Successful</h4>
+  <p id="toastBody"></p>
+  <button class="btn sq" id="toastOk">Ok</button>
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+var USERS = [
+  {id:"mc", name:"Marchall Campaigne", dob:"18/Sep/1926", room:"Chenopodia | Room 22", ini:"MC"},
+  {id:"rs", name:"Ronnie Smullen",     dob:"07/Oct/1955", room:"Ground Floor | Room 1", ini:"RS"},
+  {id:"co", name:"Cara Owain",         dob:"27/May/1941", room:"Lamia | Room 11", ini:"CO"},
+  {id:"ed", name:"Edouard Dowdle",     dob:"25/Mar/1954", room:"Chenopodia | Room 23", ini:"ED"},
+  {id:"sg", name:"Smith Girardin",     dob:"11/Mar/1939", room:"Lamia | Room 12", ini:"SG"},
+  {id:"jw", name:"Jacqueline Whebell", dob:"10/Jan/1939", room:"Ground Floor | Room 2", ini:"JW"}
+];
+
+var MEDS = [
+  "Oxyact 20mg tablets (Kent Pharma (UK) Ltd)",
+  "Oxycodone 20mg tablets",
+  "Oxytetracycline 250mg tablets",
+  "Amoxicillin 500mg capsules",
+  "Amoxicillin 250mg/5ml oral suspension",
+  "Amlodipine 5mg tablets",
+  "Amlodipine 1.5mg/5ml oral suspension",
+  "Paracetamol 500mg tablets",
+  "Paracetamol 250mg/5ml oral suspension",
+  "Paroxetine 20mg tablets",
+  "Co-codamol 30mg/500mg capsules",
+  "Codeine 30mg tablets",
+  "Furosemide 40mg tablets",
+  "Lansoprazole 30mg gastro-resistant capsules",
+  "Omeprazole 20mg gastro-resistant capsules",
+  "Warfarin 3mg tablets",
+  "Sertraline 100mg tablets",
+  "Senna 7.5mg tablets",
+  "Hydrocortisone 1% cream",
+  "Ferrous fumarate 210mg tablets"
+];
+
+var TASKS = [
+  {
+    user:"mc",
+    med:"Oxyact 20mg tablets (Kent Pharma (UK) Ltd)",
+    typeHint:"oxy",
+    qty:28,
+    dosage:"ONE to be taken TWICE a day",
+    rounds:2,
+    prn:false,
+    why:"Marchall has come back from hospital with an interim supply the pharmacy hasn't sent through."
+  },
+  {
+    user:"rs",
+    med:"Amoxicillin 500mg capsules",
+    typeHint:"amox",
+    qty:21,
+    dosage:"ONE capsule THREE times a day for 7 days",
+    rounds:3,
+    prn:false,
+    why:"The GP has started Ronnie on a short course of antibiotics today."
+  },
+  {
+    user:"co",
+    med:"Paracetamol 500mg tablets",
+    typeHint:"para",
+    qty:32,
+    dosage:"Take TWO up to four times a day WHEN REQUIRED",
+    rounds:0,
+    prn:true,
+    why:"Cara has moved in this morning with her own pain relief, to be given when required."
+  }
+];
+
+/* ---------------- state ---------------- */
+var round = 0;       // which task
+var step = 0;        // step inside task
+var selectedUser = null;
+var chosenMed = null;
+var enteredQty = null;
+var savedSchedule = null;
+
+var $ = function(id){ return document.getElementById(id); };
+
+/* ---------------- coach ---------------- */
+var STEPS = [
+  { t:"Find the resident", d:function(k){ return "Click <b>"+userName(k.user)+"</b> in the list on the left."; } },
+  { t:"Start a new medicine", d:function(){ return "Press <b>Add New Medicine</b> on the right."; } },
+  { t:"Search for the medicine", d:function(k){ return "Type <b>"+k.typeHint+"</b> in the search box and pick <b>"+k.med+"</b> from the list. Check it word for word — strength and brand included."; } },
+  { t:"Enter what was dispensed", d:function(k){ return "Put <b>"+k.qty+"</b> in the Dispensed Qty box — that's how many came in."; } },
+  { t:"Begin the setup", d:function(){ return "Press <b>Setup</b>. (Wrong medicine? Press Remove and search again.)"; } },
+  { t:"Build the schedule", d:function(){ return "Press <b>Add new schedule</b>. Nothing came from the pharmacy, so you're creating it."; } },
+  { t:"Fill the schedule in", d:function(k){
+      var r = k.prn ? "Press <b>Add PRN</b> for the round, since it's only given when required."
+                    : "Set <b>"+k.rounds+" round"+(k.rounds>1?"s":"")+"</b> — one for each time of day it's given — with the dose in each.";
+      return "Dosage instructions: <b>"+k.dosage+"</b>. Pick a start date and an end date, then "+r+" Press <b>Save</b>."; } },
+  { t:"Check it in", d:function(){ return "The schedule's on. Press <b>Check in</b> to finish."; } }
+];
+
+function userName(id){
+  for(var i=0;i<USERS.length;i++){ if(USERS[i].id===id) return USERS[i].name; }
+  return "";
+}
+function task(){ return TASKS[round]; }
+
+function paint(){
+  var k = task();
+  $("taskLabel").innerHTML = "Practice "+(round+1)+" of 3 &nbsp;·&nbsp; Step "+(step+1)+" of "+STEPS.length;
+  $("instruction").innerHTML = STEPS[step].t;
+  $("detail").innerHTML = STEPS[step].d(k) + (step===0 ? " <br><span style='color:var(--grey)'>"+k.why+"</span>" : "");
+}
+function warn(msg){
+  $("alert").innerHTML = msg;
+  $("alert").classList.add("show");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function clearWarn(){ $("alert").classList.remove("show"); }
+function praise(msg){
+  $("doneNote").innerHTML = msg;
+  $("doneNote").classList.add("show");
+  setTimeout(function(){ $("doneNote").classList.remove("show"); }, 3200);
+}
+
+/* ---------------- user list ---------------- */
+function buildUsers(){
+  var box = $("userlist");
+  box.innerHTML = '<h3>Service Users (6)</h3>';
+  USERS.forEach(function(u){
+    var d = document.createElement("div");
+    d.className = "user";
+    d.id = "u_"+u.id;
+    d.innerHTML = '<div class="ini">'+u.ini+'</div><div><div class="nm">'+u.name+'</div>'+
+                  '<div class="dob">'+u.dob+'</div></div><div class="count">0</div>';
+    d.onclick = function(){ pickUser(u); };
+    box.appendChild(d);
+  });
+}
+
+function pickUser(u){
+  clearWarn();
+  if(step > 0){ warn("You've already started this one. Carry on with the step above."); return; }
+  if(u.id !== task().user){
+    warn("That's "+u.name+". This medicine belongs to <b>"+userName(task().user)+"</b> — putting it on the wrong person's record is the one thing worth being slow about.");
+    return;
+  }
+  selectedUser = u;
+  var all = document.querySelectorAll(".user");
+  for(var i=0;i<all.length;i++){ all[i].classList.remove("active"); }
+  $("u_"+u.id).classList.add("active");
+
+  $("rIni").textContent = u.ini;
+  $("rName").innerHTML = u.name + '<span class="pill allergy">Allergies</span><span class="pill notes">Notes</span>';
+  $("rMeta").textContent = u.dob + "  |  " + u.room;
+  step = 1; paint();
+  praise("Right person. Their record is open.");
+}
+
+/* ---------------- add new medicine ---------------- */
+$("addNewBtn").onclick = function(){
+  clearWarn();
+  if(step === 0){ warn("Pick the service user on the left first."); return; }
+  if(step > 1){ warn("You're past that step — see the instruction above."); return; }
+  step = 2; paint();
+  renderSearch();
+};
+
+function renderSearch(){
+  $("adhocArea").innerHTML =
+    '<div class="rowhead"><span>Medication Name</span><span>Order Qty</span><span>Dispensed Qty</span><span></span></div>'+
+    '<div class="searchwrap">'+
+      '<input type="text" id="medSearch" placeholder="Start typing the medicine name…" autocomplete="off">'+
+      '<div class="results" id="results" style="display:none"></div>'+
+    '</div>'+
+    '<p class="hint">Type at least two letters, then choose from the list.</p>';
+
+  $("medSearch").addEventListener("input", function(){
+    var v = this.value.trim().toLowerCase();
+    var box = $("results");
+    if(v.length < 2){ box.style.display = "none"; return; }
+    var hits = MEDS.filter(function(m){ return m.toLowerCase().indexOf(v) > -1; });
+    if(!hits.length){ box.style.display = "none"; return; }
+    box.innerHTML = "";
+    hits.slice(0,7).forEach(function(m){
+      var d = document.createElement("div");
+      d.textContent = m;
+      d.onclick = function(){ chooseMed(m); };
+      box.appendChild(d);
+    });
+    box.style.display = "block";
+  });
+  $("medSearch").focus();
+}
+
+function chooseMed(m){
+  clearWarn();
+  if(m !== task().med){
+    warn("That's <b>"+m+"</b>. The label says <b>"+task().med+"</b> — different strength or brand means a different entry. Try the search again.");
+    $("results").style.display = "none";
+    $("medSearch").value = "";
+    return;
+  }
+  chosenMed = m;
+  step = 3; paint();
+  renderChosenRow();
+  praise("Good — that's the exact entry.");
+}
+
+function renderChosenRow(){
+  $("adhocArea").innerHTML =
+    '<div class="rowhead"><span>Medication Name</span><span>Order Qty</span><span>Dispensed Qty</span><span></span></div>'+
+    '<div class="medrow">'+
+      '<div class="name"><span class="tagnew">NEW</span><div class="n">'+chosenMed+'</div>'+
+        '<div class="d">Created in the home</div></div>'+
+      '<div class="oq">–</div>'+
+      '<div class="dq"><input type="number" class="qty" id="qtyBox" value="0" min="0"></div>'+
+      '<div class="act"><button class="btn sq" id="setupBtn">Setup</button>'+
+      '<button class="linkbtn" id="removeBtn">Remove</button></div>'+
+    '</div>';
+
+  $("qtyBox").addEventListener("input", function(){
+    if(parseInt(this.value,10) > 0 && step === 3){ step = 4; paint(); }
+  });
+  $("setupBtn").onclick = doSetup;
+  $("removeBtn").onclick = function(){
+    chosenMed = null; step = 2; paint(); renderSearch();
+    praise("Removed. Search for it again.");
+  };
+}
+
+function doSetup(){
+  clearWarn();
+  var q = parseInt($("qtyBox").value, 10);
+  if(!q || q < 1){ warn("Enter the quantity that was dispensed before you can set the medicine up."); return; }
+  if(q !== task().qty){
+    warn("The box says <b>"+task().qty+"</b> were dispensed. Count it in exactly as delivered — a wrong figure throws the stock out all month.");
+    return;
+  }
+  enteredQty = q;
+  step = 5; paint();
+  openSetupScreen();
+}
+
+/* ---------------- setup screen ---------------- */
+function openSetupScreen(){
+  $("screenCheckin").style.display = "none";
+  $("screenSetup").style.display = "block";
+  $("sIni").textContent = selectedUser.ini;
+  $("sName").innerHTML = selectedUser.name + '<span class="pill allergy">Allergies</span><span class="pill notes">Notes</span>';
+  $("sMeta").textContent = selectedUser.dob + "  |  " + selectedUser.room;
+  $("sMedName").textContent = chosenMed;
+  $("sMedQty").textContent = "Quantity delivered: " + enteredQty;
+  $("scheduleArea").innerHTML = '<button class="btn sq" id="addSchedBtn">Add new schedule</button>';
+  $("addSchedBtn").onclick = openModal;
+  $("checkInBtn").disabled = true;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("backBtn").onclick = function(){
+  $("screenSetup").style.display = "none";
+  $("screenCheckin").style.display = "block";
+};
+
+/* ---------------- schedule modal ---------------- */
+function roundRow(isPrn){
+  var wrap = document.createElement("div");
+  wrap.className = "roundrow";
+  wrap.innerHTML = (isPrn
+      ? '<span class="prn">PRN</span><input type="text" class="rtime" value="When required" readonly style="background:#F4F5F8;color:var(--grey)">'
+      : '<input type="time" class="rtime">')+
+    '<input type="number" class="rdose" placeholder="Dose" min="1">'+
+    '<button class="xbtn" type="button" title="Remove">×</button>';
+  wrap.setAttribute("data-prn", isPrn ? "1" : "0");
+  wrap.querySelector(".xbtn").onclick = function(){ wrap.remove(); };
+  return wrap;
+}
+
+function openModal(){
+  clearWarn();
+  if(step < 5){ warn("Finish the step above first."); return; }
+  step = 6; paint();
+  $("fDosage").value = "";
+  $("fStart").value = "";
+  $("fEnd").value = "";
+  $("fRepeat").value = 1;
+  $("roundsBox").innerHTML = "";
+  $("roundsBox").appendChild(roundRow(false));
+  $("modalAlert").classList.remove("show");
+  $("modalBack").classList.add("show");
+}
+
+$("addRoundBtn").onclick = function(){ $("roundsBox").appendChild(roundRow(false)); };
+$("addPrnBtn").onclick   = function(){ $("roundsBox").appendChild(roundRow(true)); };
+$("cancelSched").onclick = function(){ $("modalBack").classList.remove("show"); step = 5; paint(); };
+
+function modalWarn(msg){
+  $("modalAlert").innerHTML = msg;
+  $("modalAlert").classList.add("show");
+}
+
+$("saveSched").onclick = function(){
+  var k = task();
+  var dos = $("fDosage").value.trim();
+  var st = $("fStart").value, en = $("fEnd").value;
+  if(!dos){ modalWarn("Dosage instructions are mandatory — copy them from the dispensing label."); return; }
+  if(!st || !en){ modalWarn("A start date and an end date are both needed before this will save."); return; }
+  if(new Date(en) < new Date(st)){ modalWarn("The end date is before the start date."); return; }
+
+  var rows = $("roundsBox").querySelectorAll(".roundrow");
+  if(!rows.length){ modalWarn("Add at least one round, or press Add PRN for a when-required medicine."); return; }
+
+  var prnCount = 0, timed = 0, rounds = [];
+  for(var i=0;i<rows.length;i++){
+    var isPrn = rows[i].getAttribute("data-prn") === "1";
+    var dose = rows[i].querySelector(".rdose").value;
+    var time = rows[i].querySelector(".rtime").value;
+    if(!dose || parseInt(dose,10) < 1){ modalWarn("Every round needs a dose — how much is given at that time."); return; }
+    if(!isPrn && !time){ modalWarn("Every round needs a time. That's the time the medicine is actually given."); return; }
+    if(isPrn){ prnCount++; } else { timed++; rounds.push({time:time, dose:dose}); }
+  }
+
+  if(k.prn && prnCount === 0){
+    modalWarn("This one is only given when required, so it needs a <b>PRN</b> round rather than a fixed time. Press Add PRN.");
+    return;
+  }
+  if(!k.prn && timed !== k.rounds){
+    modalWarn("The label says it's given <b>"+k.rounds+" time"+(k.rounds>1?"s":"")+" a day</b>, so you need "+k.rounds+" round"+(k.rounds>1?"s":"")+" — you have "+timed+".");
+    return;
+  }
+
+  savedSchedule = {dosage:dos, start:st, end:en, rounds:rounds, prn:prnCount>0};
+  $("modalBack").classList.remove("show");
+  renderSavedSchedule();
+  step = 7; paint();
+  $("checkInBtn").disabled = false;
+  praise("Schedule saved. It'll now appear on the app at those times.");
+};
+
+function renderSavedSchedule(){
+  var s = savedSchedule;
+  var start = new Date(s.start);
+  var html = '<div style="border:1px solid var(--line);border-radius:6px;padding:12px;">'+
+    '<div style="font-weight:600;font-size:17px;">Schedule 1</div>'+
+    '<div style="font-size:15.5px;color:var(--grey);margin:4px 0 2px;">From '+fmt(s.start)+' &nbsp; To '+fmt(s.end)+'</div>'+
+    '<div style="font-size:16px;"><b>Dosage instructions:</b> '+s.dosage+'</div>'+
+    '<div style="font-size:16px;margin-top:4px;"><b>Rounds:</b> '+
+      (s.prn ? "PRN — when required" : s.rounds.map(function(r){ return r.time+" (dose "+r.dose+")"; }).join(", "))+
+    '</div></div>';
+
+  html += calendar(start, s);
+  $("scheduleArea").innerHTML = html;
+}
+
+function fmt(iso){
+  var d = new Date(iso);
+  var m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return d.getDate()+"/"+m[d.getMonth()]+"/"+d.getFullYear();
+}
+
+function calendar(start, s){
+  var first = new Date(start.getFullYear(), start.getMonth(), 1);
+  var offset = first.getDay();
+  var days = new Date(start.getFullYear(), start.getMonth()+1, 0).getDate();
+  var m = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var out = '<div class="cal"><div class="caltop">'+m[start.getMonth()]+' '+start.getFullYear()+'</div><div class="calgrid">';
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(function(d){ out += '<div class="dow">'+d+'</div>'; });
+  for(var i=0;i<offset;i++){ out += '<div class="day"></div>'; }
+  var endD = new Date(s.end);
+  for(var day=1; day<=days; day++){
+    var d = new Date(start.getFullYear(), start.getMonth(), day);
+    var on = d >= new Date(start.getFullYear(),start.getMonth(),start.getDate()) && d <= endD;
+    var times = "";
+    if(on){
+      times = s.prn ? '<span class="t">PRN</span>'
+                    : s.rounds.map(function(r){ return '<span class="t">'+r.time+'</span>'; }).join("");
+    }
+    out += '<div class="day'+(on?' on':'')+'">'+day+times+'</div>';
+  }
+  out += '</div></div>';
+  return out;
+}
+
+/* ---------------- check in ---------------- */
+$("checkInBtn").onclick = function(){
+  clearWarn();
+  if(!savedSchedule){ warn("Set the schedule up first — an adhoc medicine can't check in without one."); return; }
+  $("toastTitle").textContent = "Checkin Status - Successful";
+  $("toastBody").innerHTML = "<b>"+chosenMed+"</b> has been checked in for "+selectedUser.name+".";
+  $("toast").classList.add("show");
+};
+
+$("toastOk").onclick = function(){
+  $("toast").classList.remove("show");
+  round++;
+  if(round >= TASKS.length){
+    $("finish").classList.add("show");
+    $("coach").style.display = "none";
+    $("screenSetup").style.display = "none";
+    $("screenCheckin").style.display = "block";
+    window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+    return;
+  }
+  resetForNextRound();
+};
+
+function resetForNextRound(){
+  step = 0; selectedUser = null; chosenMed = null; enteredQty = null; savedSchedule = null;
+  $("screenSetup").style.display = "none";
+  $("screenCheckin").style.display = "block";
+  $("adhocArea").innerHTML = "";
+  $("rIni").textContent = "--";
+  $("rName").textContent = "Select a service user on the left";
+  $("rMeta").textContent = "";
+  var all = document.querySelectorAll(".user");
+  for(var i=0;i<all.length;i++){ all[i].classList.remove("active"); }
+  paint();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("againBtn").onclick = function(){
+  round = 0;
+  $("finish").classList.remove("show");
+  $("coach").style.display = "block";
+  resetForNextRound();
+};
+
+/* ---------------- go ---------------- */
+buildUsers();
+paint();
+</script>
+</body>
+</html>
