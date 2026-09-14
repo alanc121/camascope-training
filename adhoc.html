@@ -183,6 +183,11 @@ input:focus,select:focus,textarea:focus{outline:3px solid #C9A6DD;outline-offset
 }
 .modal h3{margin:0 0 4px;font-size:21px;}
 .modal .sub{color:var(--grey);font-size:15.5px;margin:0 0 16px;}
+.mcoach{
+  background:var(--purple-soft);border-left:5px solid var(--purple);border-radius:6px;
+  padding:12px 14px;margin:0 0 18px;font-size:16.5px;line-height:1.45;
+}
+.mcoach .lbl{display:block;font-size:14px;font-weight:700;color:var(--purple);margin-bottom:4px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:15.5px;color:var(--grey);margin-bottom:5px;font-weight:600;}
 .field label .star{color:var(--red);}
@@ -353,6 +358,8 @@ input:focus,select:focus,textarea:focus{outline:3px solid #C9A6DD;outline-offset
   <div class="modal">
     <h3>Schedule Pattern</h3>
     <p class="sub">All fields marked with <span style="color:var(--red)">*</span> are mandatory.</p>
+
+    <div class="mcoach" id="modalCoach"><span class="lbl">What to do here</span><span id="modalCoachText"></span></div>
 
     <div class="field">
       <label>Dosage Instructions <span class="star">*</span></label>
@@ -685,6 +692,7 @@ function openModal(){
   clearWarn();
   if(step < 5){ warn("Finish the step above first."); return; }
   step = 6; paint();
+  $("modalCoachText").innerHTML = STEPS[6].d(task());
   $("fDosage").value = "";
   $("fStart").value = "";
   $("fEnd").value = "";
